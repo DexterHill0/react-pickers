@@ -1,10 +1,9 @@
-import React from 'react'
+import React from "react";
 
-import { ExampleComponent } from 'react-pickers'
-import 'react-pickers/dist/index.css'
+import { ReactColour } from "react-pickers";
 
 const App = () => {
-  return <ExampleComponent text="Create React Library Example 😄" />
+	return <ReactColour />
 }
 
-export default App
+export default App;
