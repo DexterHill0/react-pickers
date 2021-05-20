@@ -1,7 +1,8 @@
 import React from "react";
 
-declare namespace ReactPickers {
+import tinycolor2 from "tinycolor2";
 
+declare namespace ReactPickers {
 	/**
 	 * - `swatches`:
 	 *     - `showSwatches`: Whether the swatches are visible.
@@ -17,10 +18,9 @@ declare namespace ReactPickers {
 	 *         - Works across both pickers
 	 *     - `showColourInput`: Toggles the colour input box
 	 *         - If this is disabled, `allowCopyAndPaste` will also be disabled.
+	 *  - `width` + `height`: Changes the size of the pickers.
 	 *  - `theme`: Dark / Light theme for the pickers.
-	 *  - `layout`: The layout of the components in the pickers.
-	 *      - `DEFAULT`: Larger picker usually for static use (i.e. does not get shown/hidden by a button)
-	 *      - `MINI` is a minified version of default - better for being shown and hidden by buttons. Will fit better on mobile too.
+	 *  - `visible`: Whether the picker is displayed. -- Defaults to `true`.
 	 *  - `defaultRepresentation`: The representation of the selected colour in the input box.
 	 *  - `style`: Extra css styling properties for chaning the look of the pickers. Completely inline CSS.
 	 */
@@ -40,12 +40,35 @@ declare namespace ReactPickers {
 			showColourInput?: boolean;
 		}
 
+		width?: string;
+		height?: string;
+
 		theme?: Theme;
-		layout?: Layout;
+
+		visible?: boolean;
 
 		defaultRepresentation?: ColourMode;
 
 		style?: PickerStyles;
+
+		onInit?: () => void;
+		onFocus?: () => void;
+		onBlur?: () => void;
+
+		onInput?: (text: string) => void;
+		onCopy?: () => void;
+		onPaste?: () => void;
+		onClear?: () => void
+
+		onColourChanged?: (colour: tinycolor2.Instance) => void;
+
+		onSwatchAdded?: (swatch: Swatch) => void;
+		onSwatchRemoved?: (swatch: Swatch) => void;
+		onSwatchSelected?: (swatch: Swatch) => void;
+
+		onStopAdded?: (stop: Stop) => void;
+		onStopRemoved?: (stop: Stop) => void;
+		onStopDragged?: (stop: Stop) => void;
 	}
 
 	/**
@@ -62,20 +85,19 @@ declare namespace ReactPickers {
 		colours?: {
 			background?: string;
 			fontColour?: string;
-		}
+		};
 
 		fontSize?: string;
 		fontWeight?: string;
 
 		circleSize?: string;
 
-		dropShadow: boolean;
+		dropShadow?: boolean;
 	}
 
-	/**
-	 * 
-	 */
-	export type Events = "";
+	export interface PickerThemeProps {
+		$theme: any;
+	}
 
 	/**
 	 * The theming of the picker. Can be overridden by changing the colours via the `style` prop.
@@ -85,34 +107,34 @@ declare namespace ReactPickers {
 	export type Theme = "LIGHT" | "DARK";
 
 	/**
-	 * The layout that all the components are placed in.
-	 * 
-	 * - `DEFAULT`: The default layout. Large layout better for desktop use since components are bigger.
-	 * - `MINI`: A minified version of the default layout. Better for dynamic use like on buttons. Better for mobile devices due to smaller form.
-	 * 
-	 * The minified versions are a little bit taller to compensate for the reduced width. They are still smaller than the default layouts, however.
-	 *
-	 * @default DEFAULT
-	 */
-	export type Layout = "NORMAL" | "MINI";
-
-	/**
 	 * Supported colour types.
 	 * 
 	 * NOTE: `HEX` doesn't support alpha values.
 	 */
-	export type ColourMode = "RGBA" | "HEX" | "HSVA" | "HSLA" | "CMYK";
+	export type ColourMode = "HEX" | "RGBA" | "HSVA" | "HSLA";
 
 	/**
-	 * 
+	 * Colour type - tinycolor2 instance
 	 */
-	export type ThemeContext = {
-		main: {
+	export type Colour = tinycolor2.Instance;
 
-		}
+	/**
+	 * Gradient stop.
+	 */
+	export type Stop = {
+		loc: number;
+		colour: Colour;
 	}
 
+	/**
+	 * Saved swatch.
+	 * The `object` version is for a gradient based swatch.
+	 */
+	export type Swatch = {
+		colour: object | Colour;
+	}
 }
+
 
 /**
  * The colour picker
