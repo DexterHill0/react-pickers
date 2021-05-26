@@ -1,6 +1,7 @@
 import React from "react";
 
 import { ReactPickers } from "../../types";
+import Checker from "./Checkerboard";
 
 interface Props {
 	previousColour: ReactPickers.Colour;
@@ -10,24 +11,23 @@ interface Props {
 	height?: string;
 }
 
-const Preview: React.FC<Props> = (props) => {
+const Preview: React.FC<Props> = (props: Props) => {
 
 	return (
-		<div style={{
-			"background": `linear-gradient(360deg, ${props.previousColour.toHexString()} 50%,
-										rgba(0,0,0) 50%, 
-										${props.currentColour.toHexString()} 50%)`,
-			"border": "none",
-			"borderRadius": "5px",
-			"width": props.width,
-			"height": props.height,
-		}}></div >
+		<div style={{ "width": props.width, "height": props.height }}>
+			<div style={{
+				background: `linear-gradient(360deg, ${props.previousColour.toHslString()} 50%, 
+											${props.currentColour.toHslString()} 50%)`,
+				border: "none",
+				borderRadius: "4px",
+				width: props.width,
+				height: props.height,
+				position: "absolute",
+				zIndex: 3,
+			}}></div >
+			<Checker></Checker>
+		</div>
 	)
 }
 
 export default Preview;
-
-// "background": `linear-gradient(to top, rgb(0, 0, 0), transparent), 
-// 										rgba(0, 0, 0, 0) 
-// 										linear-gradient(to left, ${props.colour},
-// 														rgb(255, 255, 255))`,

@@ -1,11 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 
-import reactCSSExtra, { styleMerge } from "reactcss-extra";
+import reactCSSExtra from "reactcss-extra";
 
 import { calculateSaturation } from "../helpers/Colour";
-import { splitEvent } from "../helpers/Utils";
 
 import { ReactPickers } from "../../types";
+import Draggable from "./Draggable";
+
 
 interface Props {
 	currentColour: ReactPickers.Colour;
@@ -15,108 +16,81 @@ interface Props {
 	width?: string;
 	height?: string;
 
-	onChanged?: (saturation: number, luminance: number) => void;
+	onChanged?: (saturation: number, value: number) => void;
 }
 
-class Palette extends React.Component<Props, {}> {
-	container: HTMLDivElement;
-	pointer: HTMLDivElement;
+const Palette: React.FC<Props> = (props: Props) => {
+	let container: HTMLDivElement;
+	let pointer: HTMLDivElement;
 
+	useEffect(() => {
+		//Set the default position on load and when the colour changes (ie. via a swatch)
+		setValues(props.currentColour.toHsv().s, props.currentColour.toHsv().v);
+	}, []);
 
-	/**
-	 * Allows for the "pointer" to continue to move even if your mouse has left the
-	 * container"s bounding box.
-	 */
-	handleMouseDown = (e: any) => {
-		this.handleMove(e);
+	const handleMove = (e: any) => {
+		const { s, v } = calculateSaturation(e, container, pointer);
 
-		window.addEventListener("mousemove", this.handleMove);
-		window.addEventListener("mouseup", this.handleMouseUp);
+		setValues(s, v);
+
+		props.onChanged && props.onChanged(s, v);
 	}
 
-	handleMouseUp = () => {
-		this.removeListeners();
+	const setValues = (saturation: number, value: number) => {
+		pointer.style.left = `${saturation * 100}%`;
+		pointer.style.top = `${-(value * 100) + 100}%`;
 	}
 
-	removeListeners() {
-		window.removeEventListener("mousemove", this.handleMove);
-		window.removeEventListener("mouseup", this.handleMouseUp);
-	}
-
-	handleMove = (e: any) => {
-		const { s, v } = calculateSaturation(e, this.container, this.pointer);
-
-		//I dont like that this code is basically identical to whats in "calculateSaturation" however, to get the pointer
-		//to stop where I want it to I have to calculate the values slightly differently.
-		const { width: cWidth, height: cHeight, left, top } = this.container.getBoundingClientRect();
-		const { width: pWidth, height: pHeight } = this.pointer.getBoundingClientRect();
-
-		let { x, y } = splitEvent(e);
-
-		x = Math.max(0, Math.min(x - (pWidth / 2) - left + window.pageXOffset, cWidth - pWidth / 2));
-		y = Math.max(0, Math.min(y - (pHeight / 2) - top + window.pageYOffset, cHeight - pHeight / 2));
-
-		this.pointer.style.top = `${y}px`;
-		this.pointer.style.left = `${x}px`;
-
-		this.props.onChanged && this.props.onChanged(s, v);
-	}
-
-	componentWillUnmount() {
-		this.removeListeners();
-	}
-
-	styles = reactCSSExtra({
+	const styles = reactCSSExtra({
 		"default": {
-			container: {
-				border: "none",
+			mainContainer: {
+				marginLeft: "50px",
+				marginTop: "50px",
+				width: props.width,
+				height: props.height,
 				borderRadius: "4px",
-				width: this.props.width,
-				height: this.props.height,
-				position: "absolute",
+				background: `linear-gradient(to top, #000, transparent),
+									rgba(0, 0, 0, 0)
+									linear-gradient(to left, ${props.currentColour.toHslString()}, 
+													#fff)`,
+				overflow: "hidden",
+			},
+			/**
+			 * I'm using another div to act like a shifted bounding box, allowing the pointer to move one radius of itself
+			 * off each side of the main container.
+			 */
+			pointerContainer: {
+				transform: `translate(calc(${props.pointerSize} / -2), calc(${props.pointerSize} / -2))`,
+				width: props.width,
+				height: props.height,
 			},
 			pointer: {
 				cursor: "pointer",
 				background: "rgba(0,0,0,0)",
-				border: "3px solid",
-				borderColor: "#FFFFFF",
-				opacity: "0.7",
-				mixBlendMode: "difference",
+				boxShadow: "0px 0px 0px 3px #fff",
 				borderRadius: "50%",
-				width: this.props.pointerSize,
-				height: this.props.pointerSize,
-				position: "absolute",
+				width: props.pointerSize,
+				height: props.pointerSize,
+				position: "relative",
 			},
 		},
 	});
 
-	render() {
-		const colour = reactCSSExtra({
-			"default": {
-				container: {
-					background: `linear-gradient(to top, #000000, transparent), 
-										rgba(0, 0, 0, 0) 
-										linear-gradient(to left, ${this.props.currentColour.toHexString()}, 
-														#ffffff)`,
-				}
-			}
-		});
-
-		return (
+	return (
+		<Draggable onDragged={handleMove}>
 			<div
-				style={styleMerge(false, colour, this.styles).container}
-				ref={container => { if (container) this.container = container; }}
-
-				onMouseDown={this.handleMouseDown}
-				onTouchMove={this.handleMove}
-				onTouchStart={this.handleMove}
+				style={styles.mainContainer}
+				ref={r => { if (r) container = r; }}
 			>
-				<div style={this.styles.pointer}
-					ref={pointer => { if (pointer) this.pointer = pointer; }}
+				<div style={styles.pointerContainer}>
+					<div style={styles.pointer}
+						ref={r => { if (r) pointer = r; }}
 				></div>
+				</div>
 			</div >
-		);
-	}
+		</Draggable>
+	);
+
 }
 
 export default Palette;

@@ -1,13 +1,13 @@
 import { map, splitEvent } from "./Utils";
 
-export const calculateSaturation = (e: any, container: HTMLDivElement, pointer: HTMLDivElement) => {
+export const calculateSaturation = (e: any, container: HTMLDivElement, _pointer: HTMLDivElement): { s: number, v: number } => {
 	const { width: cWidth, height: cHeight, left, top } = container.getBoundingClientRect();
-	const { width: pWidth, height: pHeight } = pointer.getBoundingClientRect();
+	// const { width: pWidth, height: pHeight } = pointer.getBoundingClientRect();
 
 	let { x, y } = splitEvent(e);
 
-	x = Math.max(0, Math.min(x - (pWidth / 2) - left + window.pageXOffset, cWidth));
-	y = Math.max(0, Math.min(y - (pHeight / 2) - top + window.pageYOffset, cHeight));
+	x = Math.max(0, Math.min(x - 2 - left + window.pageXOffset, cWidth));
+	y = Math.max(0, Math.min(y - 2 - top + window.pageYOffset, cHeight));
 
 	const saturation = x / cWidth;
 	const brightness = 1 - (y / cHeight);
@@ -18,14 +18,11 @@ export const calculateSaturation = (e: any, container: HTMLDivElement, pointer: 
 	}
 }
 
-export const calculateHueAlpha = (e: any, container: HTMLDivElement, pointer: HTMLDivElement, type: "HUE" | "ALPHA") => {
-	const cWidth = container.getBoundingClientRect().width;
-	const pWidth = pointer.getBoundingClientRect().width;
-
+export const calculateHueAlpha = (e: any, container: HTMLDivElement, _pointer: HTMLDivElement, type: "HUE" | "ALPHA"): number => {
+	const { width: cWidth, left } = container.getBoundingClientRect();
 	let { x } = splitEvent(e);
-	x = Math.max(0, Math.min(x - (pWidth / 2), cWidth - pWidth));
+	x = Math.max(0, Math.min(x - left, cWidth));
 
-	console.log(cWidth, pWidth)
-
-	return map(x, 0, cWidth - pWidth, 0, type === "HUE" ? 360 : 1);
+	//If type is `HUE`, map from 0 to 360. If type is `ALPHA` map from 1 to 0
+	return map(x, 0, cWidth, type === "HUE" ? 0 : 1, type === "HUE" ? 360 : 0);
 }

@@ -1,11 +1,14 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import reactCSSExtra from "reactcss-extra";
 
+import Checker from "./Checkerboard";
+
 import { calculateHueAlpha } from "../helpers/Colour";
-import withTheme from "../providers/ThemeProvider";
+import { withTheme } from "../providers/ThemeProvider";
 
 import { ReactPickers } from "../../types";
+import Draggable from "./Draggable";
 
 interface Props extends ReactPickers.PickerThemeProps {
 	pointerSize: string;
@@ -15,87 +18,88 @@ interface Props extends ReactPickers.PickerThemeProps {
 
 	type?: "HUE" | "ALPHA",
 
+	defaultValue?: number;
+
 	onChanged?: (value: number) => void;
 }
 
-class Slider extends React.Component<Props, {}> {
-	container: HTMLDivElement;
-	pointer: HTMLDivElement;
+const Slider: React.FC<Props> = (props: Props) => {
+	let container: HTMLDivElement;
+	let pointer: HTMLDivElement;
 
 
-	/**
-	 * Allows for the "pointer" to continue to move even if your mouse has left the
-	 * container"s bounding box.
-	 */
-	handleMouseDown = (e: any) => {
-		this.handleMove(e);
+	useEffect(() => {
+		//Set the default position on load and anytime the colour changes
+		setValues(props.defaultValue, props.type || "HUE");
+	}, [props.defaultValue]);
 
-		window.addEventListener("mousemove", this.handleMove);
-		window.addEventListener("mouseup", this.handleMouseUp);
+	const handleMove = (e: any) => {
+		const h = calculateHueAlpha(e, container, pointer, props.type || "HUE");
+
+		setValues(h, props.type || "HUE");
+
+		props.onChanged && props.onChanged(h);
 	}
 
-	handleMouseUp = () => {
-		this.removeListeners();
+	const setValues = (value: number | undefined, type: "HUE" | "ALPHA") => {
+		pointer.style.background = `hsla(${value}, 100%, ${type === "HUE" ? "50%, 1" : `0%, ${value}`})`;
+		pointer.style.left = `${type === "HUE" ? ((value || 0) / 360) * 100 : ((value || 1) / -1) * 100 + 100}%`;
 	}
 
-	removeListeners() {
-		window.removeEventListener("mousemove", this.handleMove);
-		window.removeEventListener("mouseup", this.handleMouseUp);
-	}
-
-	handleMove = (e: any) => {
-		const h = calculateHueAlpha(e, this.container, this.pointer, this.props.type || "HUE");
-
-		this.pointer.style.left = `${((h * 100) / 360)}%`;
-
-		this.props.onChanged && this.props.onChanged(h);
-	}
-
-	componentWillUnmount() {
-		this.removeListeners();
-	}
-
-	styles = reactCSSExtra({
+	const styles = reactCSSExtra({
 		"default": {
-			container: {
+			sliderContainer: {
 				width: "15rem",
-				height: "0.7rem",
+				height: "0.6rem",
 				background: "linear-gradient(to right, #f00 0%, #ff0 17%, #0f0, 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%)",
 				borderRadius: "4px",
-				position: "relative",
-
+			},
+			pointerContainer: {
+				position: "absolute",
+				transform: `translateX(calc(${props.pointerSize} / -2))`,
+				width: "15rem",
+				height: "0.6rem",
 			},
 			pointer: {
-				width: this.props.pointerSize,
-				height: this.props.pointerSize,
+				width: props.pointerSize,
+				height: props.pointerSize,
+				background: (props.type || "HUE") === "ALPHA" ? "#000000" : `hsla(${props.defaultValue}, 100%, 50%, 1)`,
+				boxShadow: "0px 0px 0px 3px #fff",
 				borderRadius: "50%",
-				background: "rgba(0,0,0,0)",
-				border: "3px solid",
-				borderColor: this.props.$theme.colours.border,
-				position: "absolute",
+				position: "relative",
 				top: "50%",
-				transform: "translateY(-50%)"
+				transform: `translateY(-50%)`
 			},
 		},
+		"alpha": {
+			sliderContainer: {
+				zIndex: 3,
+				background: "linear-gradient(270deg, rgba(0,0,0,0) 0%, #000000 100%)",
+			}
+		}
+	}, {
+		"alpha": props.type === "ALPHA",
 	});
 
-	render() {
-		return (
+	return (
+		<Draggable onDragged={handleMove}>
 			<div
-				style={this.styles.container}
-				ref={container => { if (container) this.container = container; }}
-
-				onMouseDown={this.handleMouseDown}
-				onTouchMove={this.handleMove}
-				onTouchStart={this.handleMove}
+				style={styles.sliderContainer}
+				ref={r => { if (r) container = r; }}
 			>
-				<div
-					style={this.styles.pointer}
-					ref={pointer => { if (pointer) this.pointer = pointer; }}
-				/>
+				{
+					props.type === "ALPHA" ? <Checker></Checker> : <div></div>
+				}
+				<div style={styles.pointerContainer}>
+					<div
+						style={styles.pointer}
+						ref={r => { if (r) pointer = r; }}
+					/>
+				</div>
 			</div>
-		);
-	}
+		</Draggable>
+	);
 }
 
 export default withTheme(Slider);
+

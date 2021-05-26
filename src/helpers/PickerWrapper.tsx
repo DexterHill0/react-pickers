@@ -2,6 +2,8 @@ import React from "react";
 
 import reactCSSExtra from "reactcss-extra";
 
+import { theme } from "../providers/ThemeProvider";
+
 import { ReactPickers } from "../../types";
 
 const BasePicker = (Picker: React.ComponentType<any>) => {
@@ -38,31 +40,37 @@ const BasePicker = (Picker: React.ComponentType<any>) => {
 			}
 		}
 
-
 		styles = reactCSSExtra({
 			"default": {
 				container: {
 					display: "flex",
 					width: this.props.width,
 					height: this.props.height,
+					userSelect: "none",
+					font: this.props.style?.font,
+					background: this.props.style?.colours?.background || ((this.props.theme || "DARK") === "DARK" ? "#161819" : "#FFFFFF"),
+					borderRadius: "4px",
 				}
 			},
 		});
 
 		render() {
 			return (
-				<div
-					ref={(self) => { if (self) this.self = self; }}
-					style={this.styles.container}
+				//Tell the provider the theme given by the user
+				<theme.Provider value={this.props.theme || "DARK"}>
+					<div
+						ref={(self) => { if (self) this.self = self; }}
+						style={this.styles.container}
 
-					onMouseDown={this.onFocused}
-					onTouchStart={this.onFocused}
-				>
-					{
-						//Focus is passed down as a prop
-						this.props.visible === false ? <div></div> : <Picker {...this.props} {...this.state} />
-					}
-				</div>
+						onMouseDown={this.onFocused}
+						onTouchStart={this.onFocused}
+					>
+						{
+							//Focus is passed down as a prop
+							this.props.visible === false ? <div></div> : <Picker {...this.props} {...this.state} />
+						}
+					</div>
+				</theme.Provider >
 			)
 		}
 	}

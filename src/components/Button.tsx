@@ -1,29 +1,37 @@
 import React from "react";
 
-import { ReactPickers } from "../../types";
-
 import { withTheme } from "../providers/ThemeProvider";
+
+import { ReactPickers } from "../../types";
 
 interface Props extends ReactPickers.PickerThemeProps {
 	text: string;
 
-	background?: string;
-	fontColour?: string;
+	disabled?: boolean;
+
+	style?: "normal" | "danger";
 	width?: string;
 	height?: string;
+
+	onClick?: (e: any) => void;
 }
 
 const Input: React.FC<Props> = (props: Props) => {
 
 	return (
-		<input type="text" defaultValue={props.text} style={{
+		<button style={{
 			border: "none",
 			borderRadius: "4px",
-			background: props.$theme.colours.input,
+			background: props.$theme.colours[(props.style || "normal") === "normal" ? "buttonEnabled" : "warningButtonEnabled"],
 			width: props.width,
 			height: props.height,
 			color: props.$theme.colours.text,
-		}}></input >
+		}}
+			disabled={props.disabled || false}
+			onClick={props.onClick}
+		>
+			{props.text}
+		</button >
 	)
 }
 
