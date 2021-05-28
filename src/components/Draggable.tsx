@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 
+const isTouch = window.matchMedia("(pointer: coarse)").matches;
 
 interface Props {
 	style?: any;
@@ -13,8 +14,8 @@ const Draggable: React.FC<Props> = (props: Props) => {
 	const handleMouseDown = (e: any) => {
 		handleMove(e);
 
-		window.addEventListener("mousemove", handleMove);
-		window.addEventListener("mouseup", handleMouseUp);
+		window.addEventListener(!isTouch ? "mousemove" : "touchmove", handleMove);
+		window.addEventListener(!isTouch ? "mouseup" : "touchend", handleMouseUp);
 	}
 
 	const handleMouseUp = () => {
@@ -22,21 +23,26 @@ const Draggable: React.FC<Props> = (props: Props) => {
 	}
 
 	const removeListeners = () => {
-		window.removeEventListener("mousemove", handleMove);
-		window.removeEventListener("mouseup", handleMouseUp);
+		window.removeEventListener(!isTouch ? "mousemove" : "touchmove", handleMove);
+		window.removeEventListener(!isTouch ? "mouseup" : "touchend", handleMouseUp);
 	}
 
 	const handleMove = (e: any) => {
 		props.onDragged(e);
 	}
 
+	useEffect(() => {
+		return removeListeners;
+	}, []);
 
 	return (
 		<div
 			style={props.style}
+
 			onMouseDown={handleMouseDown}
-			onTouchMove={handleMove}
-			onTouchStart={handleMove}
+			//Originally I had onTouchMove here but it wasn't working with deleting the swatches so I
+			//changed it to use touch event listeners if the device supports touch
+			onTouchStart={handleMouseDown}
 		>
 			{
 				props.children

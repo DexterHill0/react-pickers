@@ -1,43 +1,32 @@
 import React, { useEffect, useState } from "react";
 
 import reactCSSExtra from "reactcss-extra";
-import tc2 from "tinycolor2";
+import Color from "color";
 
 import Button from "./Button";
 import Checker from "./Checkerboard";
+import Draggable from "./Draggable";
+import { Col, Grid, Row } from "./flex/Flex";
 
+import { splitEvent } from "../helpers/Utils";
 import Gradient from "../helpers/Gradient";
+import { isValidColour } from "../helpers/Colour";
 import { withTheme } from "../providers/ThemeProvider";
 
 import { ReactPickers } from "../../types";
-import Draggable from "./Draggable";
-import { splitEvent } from "../helpers/Utils";
 
-type S = string[];
-
-interface ContainerProps extends ReactPickers.PickerThemeProps {
-	showSwatches?: boolean;
-
-	disableSwatchCollapse?: boolean;
-	allowSave?: boolean;
-	maxSwatches?: number;
-	defaultSwatches?: S;
-
-	currentColour: ReactPickers.Colour;
-
-	onSwatchAdded?: (swatch: ReactPickers.Swatch) => void;
-	onSwatchRemoved?: (index: number) => void;
-	onSwatchSelected?: (swatch: ReactPickers.Swatch) => void;
-}
 
 //Custom hook to allow for adding and removing swatches easily
-const useSwatches = (defaultSwatches: S, max: number) => {
+const useSwatches = (defaultSwatches: string[], max: number) => {
 	const [swatches, setSwatches] = useState<string[]>([]);
 
 	useEffect(() => {
 		//Validate the default swatches
 		setSwatches(defaultSwatches.filter((s) => {
-			if (tc2(s).isValid() || Gradient.isValid(s)) return s;
+
+			if (Gradient.isValid(s) || isValidColour(s)) return s
+			else console.warn("Invalid swatch provided!");
+
 			return "";
 		}));
 	}, []);
@@ -57,6 +46,7 @@ const useSwatches = (defaultSwatches: S, max: number) => {
 interface SwatchProps {
 	col: string;
 	index: number;
+
 	onRemove: (index: number) => void;
 	onSelected: (col: string) => void;
 }
@@ -74,7 +64,7 @@ const Swatch: React.FC<SwatchProps> = (props: SwatchProps) => {
 		const hidden = Math.abs(startY - y);
 
 		//Drag threshold for removing
-		if (hidden >= 38 && hidden <= 40) {
+		if (hidden >= 28 && hidden <= 30) {
 			props.onRemove(props.index);
 		}
 	}
@@ -85,8 +75,8 @@ const Swatch: React.FC<SwatchProps> = (props: SwatchProps) => {
 				<div style={{
 					borderRadius: "4px",
 					background: props.col,
-					width: "1.7rem",
-					height: "1.7rem",
+					width: "1.9rem",
+					height: "1.9rem",
 				}}></div>
 				<Checker></Checker>
 			</div>
@@ -94,26 +84,40 @@ const Swatch: React.FC<SwatchProps> = (props: SwatchProps) => {
 	);
 }
 
+interface ContainerProps extends ReactPickers.PickerThemeProps {
+	showSwatches?: boolean;
+
+	disableSwatchCollapse?: boolean;
+	allowSave?: boolean;
+	maxSwatches?: number;
+	defaultSwatches?: string[];
+
+	currentColour: ReactPickers.Colour;
+
+	onSwatchAdded?: (swatch: ReactPickers.Swatch) => void;
+	onSwatchRemoved?: (index: number) => void;
+	onSwatchSelected?: (swatch: ReactPickers.Swatch) => void;
+}
 
 const SwatchContainer: React.FC<ContainerProps> = (props: ContainerProps) => {
 
-	const [isShown, setIsShown] = useState(true);
+	const [isShown, setIsShown] = useState(false);
 
 	const { swatches, addSwatch, removeSwatch } = useSwatches(props.defaultSwatches || [], props.maxSwatches || 15);
 
 	const styles = reactCSSExtra({
 		"default": {
 			container: {
-				display: "flex",
-				alignItems: "flex-start",
 				color: props.$theme.colours.text,
 				overflow: "hidden",
 			},
 			swatchContainer: {
-				position: "relative",
-				transition: "opacity 0.3s, transform 0.6s",
-				transform: `translateY(${isShown ? "0" : "-100%"})`,
-				opacity: `${isShown ? "1" : "0"}`,
+				//If the swatches aren't shown, just set display to none. If they are shown but there isnt any swatches,
+				//don't set the display to inline flex since it makes the swatch container grow even though there isn't any swatches
+				display: isShown ? swatches.length > 0 ? "inline-flex" : "" : "none",
+				flexWrap: "wrap",
+				gap: "5px",
+				marginTop: "5px",
 			},
 		}
 	});
@@ -128,33 +132,42 @@ const SwatchContainer: React.FC<ContainerProps> = (props: ContainerProps) => {
 		<div style={styles.container}>
 			{
 				(props.showSwatches || true) ?
-					<div>
-						<div onClick={() => setIsShown(!isShown)}>
-							<div>{isShown ? "V" : ">"}</div>
-
-							<div>Swatches</div>
-						</div>
-						{
-							(props.allowSave || true) ? <Button text="Save" onClick={() => {
-								addSwatch(props.currentColour.toHslString());
-
-								//Emit the event if a new swatch needs to be added
-								props.onSwatchAdded && props.onSwatchAdded(props.currentColour);
-							}}></Button> : <div></div>
-						}
-						<div style={styles.swatchContainer}>
-							{
-								swatches.map((s, i) => <Swatch
-									key={i}
-									col={s}
-									onRemove={remove}
-									onSelected={(col) => props.onSwatchSelected && props.onSwatchSelected(tc2(col))}
-									index={i}>
-								</Swatch>)
-							}
-						</div>
-
-					</div> : <div></div>
+					<Grid>
+						<Row>
+							<Col grow={1} maxWidth="9rem">
+								<div onClick={() => setIsShown(!isShown)}>
+									<div>{isShown ? "▼" : "▶"}&nbsp;&nbsp;&nbsp;Swatches</div>
+								</div>
+							</Col>
+							<Col>
+								{
+									(props.allowSave || true) ? <Button width="3rem" height="1.5rem" text="Save" onClick={() => {
+										addSwatch(props.currentColour.hsl().toString());
+										//Show the swatches if a new one is added
+										setIsShown(true);
+										//Emit the event if a new swatch needs to be added
+										props.onSwatchAdded && props.onSwatchAdded(props.currentColour);
+									}}></Button> : <div></div>
+								}
+							</Col>
+						</Row>
+						<Row>
+							<Col grow={1}>
+								<div style={styles.swatchContainer}>
+									{
+										swatches.map((s, i) => <Swatch
+											key={i}
+											col={s}
+											onRemove={remove}
+											onSelected={(col) => props.onSwatchSelected && props.onSwatchSelected(Color(col))}
+											index={i}>
+										</Swatch>)
+									}
+								</div>
+							</Col>
+						</Row>
+					</Grid>
+					: <div></div>
 			}
 		</div>
 	)

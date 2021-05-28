@@ -25,8 +25,8 @@ const Palette: React.FC<Props> = (props: Props) => {
 
 	useEffect(() => {
 		//Set the default position on load and when the colour changes (ie. via a swatch)
-		setValues(props.currentColour.toHsv().s, props.currentColour.toHsv().v);
-	}, []);
+		setValues(props.currentColour.saturationv(), props.currentColour.value());
+	}, [props.currentColour]);
 
 	const handleMove = (e: any) => {
 		const { s, v } = calculateSaturation(e, container, pointer);
@@ -37,8 +37,8 @@ const Palette: React.FC<Props> = (props: Props) => {
 	}
 
 	const setValues = (saturation: number, value: number) => {
-		pointer.style.left = `${saturation * 100}%`;
-		pointer.style.top = `${-(value * 100) + 100}%`;
+		pointer.style.left = `${saturation}%`;
+		pointer.style.top = `${-value + 100}%`;
 	}
 
 	const styles = reactCSSExtra({
@@ -51,7 +51,7 @@ const Palette: React.FC<Props> = (props: Props) => {
 				borderRadius: "4px",
 				background: `linear-gradient(to top, #000, transparent),
 									rgba(0, 0, 0, 0)
-									linear-gradient(to left, ${props.currentColour.toHslString()}, 
+									linear-gradient(to left, hsl(${props.currentColour.hue()}, 100%, 50%),
 													#fff)`,
 				overflow: "hidden",
 			},

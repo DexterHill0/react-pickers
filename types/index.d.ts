@@ -1,8 +1,7 @@
 import React from "react";
 
-import tinycolor2 from "tinycolor2";
-
 import { DirectionalNode, AngularNode } from "gradient-parser";
+import Color from "color";
 
 declare namespace ReactPickers {
 	/**
@@ -71,7 +70,7 @@ declare namespace ReactPickers {
 		onPaste?: () => void;
 		onClear?: () => void
 
-		onColourChanged?: (colour: tinycolor2.Instance) => void;
+		onColourChanged?: (colour: Colour) => void;
 
 		onSwatchAdded?: (swatch: Swatch) => void;
 		onSwatchRemoved?: (index: number) => void;
@@ -113,6 +112,9 @@ declare namespace ReactPickers {
 		fontWeight?: string;
 		font?: string;
 
+		/**
+		 * The size of the draggable pointers
+		 */
 		circleSize?: string;
 
 		dropShadow?: boolean;
@@ -132,9 +134,9 @@ declare namespace ReactPickers {
 	/**
 	 * Supported colour types.
 	 * 
-	 * NOTE: `HEX` doesn't support alpha values.
+	 * NOTE: `HEX8` supports alpha, `HEX` does not.
 	 */
-	export type ColourMode = "HEX" | "RGBA" | "HSVA" | "HSLA";
+	export type ColourMode = "HEX" | "HEX8" | "RGB" | "HSL";
 
 	/**
 	 * Supported gradient modes
@@ -144,8 +146,16 @@ declare namespace ReactPickers {
 	/**
 	 * Colour type - tinycolor2 instance
 	 */
-	export type Colour = tinycolor2.Instance;
+	export type Colour = Color;
 
+	/**
+	 * Plain colour object
+	 */
+	export type ColourObject = { h: number, s: number, v: number, a: number };
+
+	/**
+	 * Gradient object that stores values
+	 */
 	export type GradientObject = {
 		type: GradientMode;
 		orientation: {
@@ -158,6 +168,9 @@ declare namespace ReactPickers {
 		}[];
 	}
 
+	/**
+	 * Gradient class
+	 */
 	export class Gradient {
 		type: GradientMode;
 		orientation: {

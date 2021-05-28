@@ -16,8 +16,8 @@ const Preview: React.FC<Props> = (props: Props) => {
 	return (
 		<div style={{ "width": props.width, "height": props.height }}>
 			<div style={{
-				background: `linear-gradient(360deg, ${props.previousColour.toHslString()} 50%, 
-											${props.currentColour.toHslString()} 50%)`,
+				background: `linear-gradient(360deg, ${props.previousColour.hsl().string()} 50%, 
+											${props.currentColour.hsl().string()} 50%)`,
 				border: "none",
 				borderRadius: "4px",
 				width: props.width,

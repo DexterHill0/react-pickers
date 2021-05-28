@@ -5,7 +5,7 @@ import { ReactColour } from "react-pickers";
 const App = () => {
 	return (
 		<div>
-			<ReactColour defaultColour={"rgba(212, 10, 112, 1)"} />
+			<ReactColour defaultColour={"rgba(161, 114, 111)"} inputs={{ defaultRepresentation: "HSL", showAlpha: true }} />
 		</div>
 	);
 }

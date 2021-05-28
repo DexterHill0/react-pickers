@@ -43,7 +43,7 @@ const BasePicker = (Picker: React.ComponentType<any>) => {
 		styles = reactCSSExtra({
 			"default": {
 				container: {
-					display: "flex",
+					padding: "5px 5px 5px 5px",
 					width: this.props.width,
 					height: this.props.height,
 					userSelect: "none",

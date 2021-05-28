@@ -8,3 +8,13 @@ export const splitEvent = (e: any) => {
 
 	return { x, y };
 }
+
+export const copyToClipboard = (text: string) => {
+	navigator.clipboard.writeText(text).catch(() => {
+		console.error("Unable to copy to clipboard");
+	});
+}
+
+export const readFromClipboard = async () => {
+	return await navigator.clipboard.readText();
+}
