@@ -13,9 +13,6 @@ interface Props {
 
 	pointerSize: string;
 
-	width?: string;
-	height?: string;
-
 	onChanged?: (saturation: number, value: number) => void;
 }
 
@@ -43,12 +40,16 @@ const Palette: React.FC<Props> = (props: Props) => {
 
 	const styles = reactCSSExtra({
 		"default": {
+			draggable: {
+				position: "relative",
+				width: "100%",
+				height: "100%",
+			},
 			mainContainer: {
-				marginLeft: "50px",
-				marginTop: "50px",
-				width: props.width,
-				height: props.height,
+				width: "inherit",
+				height: "inherit",
 				borderRadius: "4px",
+				position: "relative",
 				background: `linear-gradient(to top, #000, transparent),
 									rgba(0, 0, 0, 0)
 									linear-gradient(to left, hsl(${props.currentColour.hue()}, 100%, 50%),
@@ -61,13 +62,13 @@ const Palette: React.FC<Props> = (props: Props) => {
 			 */
 			pointerContainer: {
 				transform: `translate(calc(${props.pointerSize} / -2), calc(${props.pointerSize} / -2))`,
-				width: props.width,
-				height: props.height,
+				width: "inherit",
+				height: "inherit",
 			},
 			pointer: {
 				cursor: "pointer",
 				background: "rgba(0,0,0,0)",
-				boxShadow: "0px 0px 0px 3px #fff",
+				boxShadow: "0px 0px 0px 2px #fff",
 				borderRadius: "50%",
 				width: props.pointerSize,
 				height: props.pointerSize,
@@ -77,7 +78,7 @@ const Palette: React.FC<Props> = (props: Props) => {
 	});
 
 	return (
-		<Draggable onDragged={handleMove}>
+		<Draggable onDragged={handleMove} style={styles.draggable}>
 			<div
 				style={styles.mainContainer}
 				ref={r => { if (r) container = r; }}

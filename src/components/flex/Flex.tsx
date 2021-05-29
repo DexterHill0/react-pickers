@@ -1,7 +1,5 @@
 import React from "react";
 
-import { useMediaQuery } from "../../helpers/MediaQueries";
-
 const Grid: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
 	return (
 		<div>
@@ -10,10 +8,25 @@ const Grid: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
 	)
 }
 
-const Row: React.FC<{ children?: React.ReactNode, gap?: string }> = ({ children, gap }) => {
+interface RowProps {
+	gap?: string;
+	rowGap?: string;
+	columnGap?: string
+	align?: string;
+
+	children?: React.ReactNode;
+}
+
+const Row: React.FC<RowProps> = (props: RowProps) => {
 	return (
-		<div style={{ display: "flex", gap: gap }}>
-			{ children}
+		<div style={{
+			display: "flex",
+			gap: props.gap,
+			rowGap: props.rowGap,
+			columnGap: props.columnGap,
+			alignItems: props.align
+		}}>
+			{ props.children}
 		</div>
 	)
 }
@@ -26,13 +39,10 @@ interface ColumnProps {
 	maxWidth?: string;
 	minWidth?: string;
 
-	collapse?: any;
 	children?: React.ReactNode
 }
 
 const Col: React.FC<ColumnProps> = (props: ColumnProps) => {
-
-	const q = props.collapse && useMediaQuery(props.collapse);
 
 	return (
 		<div style={{
@@ -41,7 +51,6 @@ const Col: React.FC<ColumnProps> = (props: ColumnProps) => {
 			width: props.width,
 			maxWidth: props.maxWidth,
 			minWidth: props.minWidth,
-			display: q ? "none" : "",
 		}}
 		>
 			{props.children}

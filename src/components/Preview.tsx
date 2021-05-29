@@ -6,22 +6,19 @@ import Checker from "./Checkerboard";
 interface Props {
 	previousColour: ReactPickers.Colour;
 	currentColour: ReactPickers.Colour;
-
-	width?: string;
-	height?: string;
 }
 
 const Preview: React.FC<Props> = (props: Props) => {
 
 	return (
-		<div style={{ "width": props.width, "height": props.height }}>
+		<div style={{ position: "relative", width: "100%", height: "100%", marginRight: "5px" }}>
 			<div style={{
 				background: `linear-gradient(360deg, ${props.previousColour.hsl().string()} 50%, 
 											${props.currentColour.hsl().string()} 50%)`,
 				border: "none",
 				borderRadius: "4px",
-				width: props.width,
-				height: props.height,
+				width: "inherit",
+				height: "inherit",
 				position: "absolute",
 				zIndex: 3,
 			}}></div >

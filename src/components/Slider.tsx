@@ -13,9 +13,6 @@ import Draggable from "./Draggable";
 interface Props extends ReactPickers.PickerThemeProps {
 	pointerSize: string;
 
-	width?: string;
-	height?: string;
-
 	type?: "HUE" | "ALPHA",
 
 	defaultValue?: number;
@@ -48,23 +45,29 @@ const Slider: React.FC<Props> = (props: Props) => {
 
 	const styles = reactCSSExtra({
 		"default": {
+			draggable: {
+				position: "relative",
+				width: "100%",
+				height: "0.7rem",
+				marginBottom: "10px",
+			},
 			sliderContainer: {
-				width: "15rem",
-				height: "0.6rem",
+				width: "inherit",
+				height: "inherit",
 				background: "linear-gradient(to right, #f00 0%, #ff0 17%, #0f0, 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%)",
 				borderRadius: "4px",
 			},
 			pointerContainer: {
 				position: "absolute",
 				transform: `translateX(calc(${props.pointerSize} / -2))`,
-				width: "15rem",
-				height: "0.6rem",
+				width: "inherit",
+				height: "inherit",
 			},
 			pointer: {
 				width: props.pointerSize,
 				height: props.pointerSize,
 				background: (props.type || "HUE") === "ALPHA" ? "#000000" : `hsla(${props.defaultValue}, 100%, 50%, 1)`,
-				boxShadow: "0px 0px 0px 3px #fff",
+				boxShadow: "0px 0px 0px 2px #fff",
 				borderRadius: "50%",
 				position: "relative",
 				top: "50%",
@@ -73,7 +76,6 @@ const Slider: React.FC<Props> = (props: Props) => {
 		},
 		"alpha": {
 			sliderContainer: {
-				zIndex: 3,
 				background: "linear-gradient(270deg, rgba(0,0,0,0) 0%, #000000 100%)",
 			}
 		}
@@ -82,7 +84,7 @@ const Slider: React.FC<Props> = (props: Props) => {
 	});
 
 	return (
-		<Draggable onDragged={handleMove}>
+		<Draggable onDragged={handleMove} style={styles.draggable}>
 			<div
 				style={styles.sliderContainer}
 				ref={r => { if (r) container = r; }}

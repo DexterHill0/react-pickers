@@ -23,14 +23,13 @@ const withTheme = (Component: React.ComponentType<{ props?: any, $theme?: any }>
 								colours: {
 									background: this.props.style?.colours?.background || "#161819",
 
-									text: this.props.style?.colours?.fontColour || "#FFFFFF",
+									text: this.props.style?.colours?.fontColour || "#FFF",
 
-									border: "#545B5E",
+									border: "#FFF",
 
-									buttonEnabled: "#0943A2",
+									buttonEnabled: "#74B3CE",
 									warningButtonEnabled: "#191B1C",
-									buttonDisabled: "#181A1B",
-									input: "#181A1B",
+									input: "#2A2A2A",
 								},
 								extra: {
 									color: "red"
@@ -38,11 +37,11 @@ const withTheme = (Component: React.ComponentType<{ props?: any, $theme?: any }>
 							},
 							"light": {
 								colours: {
-									background: this.props.style?.colours?.background || "#FFFFFF",
+									background: this.props.style?.colours?.background || "#FFF",
 
-									text: this.props.style?.colours?.fontColour || "#000000",
+									text: this.props.style?.colours?.fontColour || "#000",
 
-									border: "#545B5E0",
+									border: "#000",
 
 									warningButtonEnabled: "#F9FBFD",
 									buttonEnabled: "#3D7BE2",

@@ -51,6 +51,8 @@ declare namespace ReactPickers {
 			defaultRepresentation?: ColourMode;
 		}
 
+		size?: Size;
+
 		width?: string;
 		height?: string;
 
@@ -68,7 +70,7 @@ declare namespace ReactPickers {
 		onInput?: (text: string) => void;
 		onCopy?: () => void;
 		onPaste?: () => void;
-		onClear?: () => void
+		onClear?: () => void;
 
 		onColourChanged?: (colour: Colour) => void;
 
@@ -88,8 +90,9 @@ declare namespace ReactPickers {
 		inputs?: {
 			showAlpha?: boolean;
 			allowCopyAndPaste?: boolean;
-
 			showColourInput?: boolean;
+
+			defaultRepresentation?: ColourMode;
 
 			showGradientType?: GradientMode,
 			showGradientAngle?: number,
@@ -125,11 +128,25 @@ declare namespace ReactPickers {
 	}
 
 	/**
+	 * Props for the props provider
+	 */
+	export type PropsProviderProps =
+		ReactPickers.PickerProps &
+		ReactPickers.GradientPickerProps &
+		ReactPickers.PickerThemeProps &
+		{ currCol: ReactPickers.Colour, $theme?: any }
+
+	/**
 	 * The theming of the picker. Can be overridden by changing the colours via the `style` prop.
 	 * 
 	 * @default DARK
 	 */
 	export type Theme = "LIGHT" | "DARK";
+
+	/**
+	 * The sizes of the pickers.
+	 */
+	export type Size = "NORMAL" | "MINI";
 
 	/**
 	 * Supported colour types.
@@ -199,7 +216,7 @@ declare namespace ReactPickers {
 	 * Saved swatch.
 	 * The `object` version is for a gradient based swatch.
 	 */
-	export type Swatch = Colour;
+	export type Swatch = Colour | Gradient;
 }
 
 declare class ReactColour extends React.Component<ReactPickers.PickerProps, {}> { }

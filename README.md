@@ -1,6 +1,6 @@
 # react-pickers
 
-> A responsive colour and gradient picker made in React
+> A feature rich colour and gradient picker made in React
 
 [![NPM](https://img.shields.io/npm/v/react-pickers.svg)](https://www.npmjs.com/package/@dexterhill0/react-pickers) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 

@@ -1,6 +1,8 @@
 import React from "react";
 import reactCSSExtra from "reactcss-extra";
 
+import { Col, Grid, Row } from "./flex/Flex";
+
 import { withTheme } from "../providers/ThemeProvider";
 
 import { ReactPickers } from "../../types";
@@ -60,10 +62,16 @@ const Input: React.FC<Props> = (props: Props) => {
 
 	return (
 		<div style={styles.container}>
-			<div>{props.colourMode}</div>
-			<input type="text" value={constructString()} style={styles.input}
-				onChange={(event) => props.onValueChanged && props.onValueChanged(event.target.value)}
-			></input >
+			<Grid>
+				<Row>
+					<Col>
+						<div>{props.colourMode}</div>
+						<input type="text" value={constructString()} style={styles.input}
+							onChange={(event) => props.onValueChanged && props.onValueChanged(event.target.value)}
+						></input >
+					</Col>
+				</Row>
+			</Grid>
 		</div >
 	)
 }
