@@ -1,9 +1,9 @@
 import React from "react";
 
-const Grid: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
+const Grid: React.FC<{ children?: React.ReactNode, direction?: "row" | "column", gap?: string; }> = ({ children, direction, gap }) => {
 	return (
-		<div>
-			{ children}
+		<div style={{ display: "flex", flexDirection: direction, gap: gap }}>
+			{children}
 		</div>
 	)
 }
@@ -14,17 +14,22 @@ interface RowProps {
 	columnGap?: string
 	align?: string;
 
+	display?: string
+
+	order?: number;
+
 	children?: React.ReactNode;
 }
 
 const Row: React.FC<RowProps> = (props: RowProps) => {
 	return (
 		<div style={{
-			display: "flex",
+			display: props.display,
 			gap: props.gap,
 			rowGap: props.rowGap,
 			columnGap: props.columnGap,
-			alignItems: props.align
+			alignItems: props.align,
+			order: props.order,
 		}}>
 			{ props.children}
 		</div>

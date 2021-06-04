@@ -9,7 +9,6 @@ interface Props extends ReactPickers.PickerThemeProps {
 
 	disabled?: boolean;
 
-	style?: "normal" | "danger";
 	width?: string;
 	height?: string;
 
@@ -22,7 +21,7 @@ const Input: React.FC<Props> = (props: Props) => {
 		<button style={{
 			border: "none",
 			borderRadius: "4px",
-			background: props.$theme.colours[(props.style || "normal") === "normal" ? "buttonEnabled" : "warningButtonEnabled"],
+			background: props.$theme.colours.button,
 			width: props.width,
 			height: props.height,
 			color: props.$theme.colours.text,

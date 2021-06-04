@@ -27,8 +27,7 @@ const withTheme = (Component: React.ComponentType<{ props?: any, $theme?: any }>
 
 									border: "#FFF",
 
-									buttonEnabled: "#74B3CE",
-									warningButtonEnabled: "#191B1C",
+									button: "#74B3CE",
 									input: "#2A2A2A",
 								},
 								extra: {
@@ -43,9 +42,7 @@ const withTheme = (Component: React.ComponentType<{ props?: any, $theme?: any }>
 
 									border: "#000",
 
-									warningButtonEnabled: "#F9FBFD",
-									buttonEnabled: "#3D7BE2",
-									buttonDisabled: "#F1F3F4",
+									button: "#3D7BE2",
 									input: "#F1F3F4",
 								}
 							},

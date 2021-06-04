@@ -35,13 +35,7 @@ declare namespace ReactPickers {
 	 *     - NOTE: Does **not** override the gradient provided in `defaultColour`
 	 */
 	export interface PickerProps {
-		swatches?: {
-			showSwatches?: boolean;
-			disableSwatchCollapse?: boolean;
-			allowSave?: boolean;
-			maxSwatches?: number;
-			defaultSwatches?: string[];
-		}
+		swatches?: SwatchProps;
 
 		inputs?: {
 			showAlpha?: boolean;
@@ -74,13 +68,34 @@ declare namespace ReactPickers {
 
 		onColourChanged?: (colour: Colour) => void;
 
-		onSwatchAdded?: (swatch: Swatch) => void;
-		onSwatchRemoved?: (index: number) => void;
-		onSwatchSelected?: (swatch: Swatch) => void;
-
 		onStopAdded?: (stop: Stop) => void;
 		onStopRemoved?: (stop: Stop) => void;
 		onStopDragged?: (stop: Stop) => void;
+	}
+
+	/**
+	 * State of the picker HOC. Also used as props for the actual pickers.
+	 */
+	export interface State {
+		currCol: ReactPickers.Colour;
+		prevCol: ReactPickers.Colour;
+
+		$update?: (col: string) => void
+	}
+
+	/**
+	 * Prop definitions for the swatch container
+	 */
+	export interface SwatchProps {
+		showSwatches?: boolean;
+		disableSwatchCollapse?: boolean;
+		allowSave?: boolean;
+		maxSwatches?: number;
+		defaultSwatches?: string[];
+
+		onSwatchAdded?: (swatch: Swatch) => void;
+		onSwatchRemoved?: (index: number) => void;
+		onSwatchSelected?: (swatch: Swatch) => void;
 	}
 
 	/**
@@ -112,7 +127,7 @@ declare namespace ReactPickers {
 		};
 
 		fontSize?: string;
-		fontWeight?: string;
+		fontWeight?: "bold" | "normal" | "bolder" | "lighter";
 		font?: string;
 
 		/**
@@ -126,15 +141,6 @@ declare namespace ReactPickers {
 	export interface PickerThemeProps {
 		$theme?: any;
 	}
-
-	/**
-	 * Props for the props provider
-	 */
-	export type PropsProviderProps =
-		ReactPickers.PickerProps &
-		ReactPickers.GradientPickerProps &
-		ReactPickers.PickerThemeProps &
-		{ currCol: ReactPickers.Colour, $theme?: any }
 
 	/**
 	 * The theming of the picker. Can be overridden by changing the colours via the `style` prop.
@@ -153,7 +159,7 @@ declare namespace ReactPickers {
 	 * 
 	 * NOTE: `HEX8` supports alpha, `HEX` does not.
 	 */
-	export type ColourMode = "HEX" | "HEX8" | "RGB" | "HSL";
+	export type ColourMode = "HEX" | "HEX8" | "RGB" | "HSL" | "HSV";
 
 	/**
 	 * Supported gradient modes
@@ -195,8 +201,12 @@ declare namespace ReactPickers {
 			value: string;
 		}
 		colourStops: {
-			type: "hex" | "rgb" | "rgba",
+			type: string,
 			value: string,
+			length: {
+				type: string;
+				value: string;
+			}
 		}[];
 
 		constructor(gradient: string | GradientObject);
