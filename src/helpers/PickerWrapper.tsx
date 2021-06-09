@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 
 import reactCSSExtra from "reactcss-extra";
-
 import Color from "color";
 
 import Palette from "../components/Palette";
@@ -9,14 +8,14 @@ import Preview from "../components/Preview";
 import Inputs from "../components/Inputs";
 import Slider from "../components/Slider";
 import Button from "../components/Button";
-import { Col, Grid, Row } from "../components/flex/Flex";
 
 import { copyToClipboard, readFromClipboard } from "./Utils";
-import { isValidColour } from "./Colour";
+import { isValidColour, toValue } from "./Colour";
 
 import { theme } from "../providers/ThemeProvider";
 
 import { ReactPickers } from "../../types";
+
 
 const BasePicker = (Picker: React.ComponentType<any>) => {
 
@@ -24,18 +23,14 @@ const BasePicker = (Picker: React.ComponentType<any>) => {
 		let self: HTMLDivElement;
 
 		const getColour = () => {
-			if (!isValidColour(props.defaultColour)) {
-				console.warn("Invalid default colour provided!");
-
-				return Color([0, 0, 0, 1]);
+			if (props.defaultColour && isValidColour(props.defaultColour)) {
+				return Color(props.defaultColour).hsv();
 			}
-			else return Color(props.defaultColour).hsv();
+			else return Color().hsv();
 		}
 
-		const [state, setState] = useState({
-			isFocused: false,
-
-			prevCol: Color([0, 0, 0, 1]),
+		const [state, setState] = useState<ReactPickers.State>({
+			prevCol: Color(),
 
 			currCol: getColour(),
 		});
@@ -49,12 +44,10 @@ const BasePicker = (Picker: React.ComponentType<any>) => {
 			props.onColourChanged && props.onColourChanged(state.currCol);
 		}, [state.currCol]);
 
-
 		const onFocused = () => {
 			document.addEventListener("mousedown", onLostFocus);
 
 			props.onFocus && props.onFocus();
-			setState({ ...state, isFocused: true });
 		}
 		const onLostFocus = (e: any) => {
 			//If the element clicked on is anything but the current picker
@@ -63,105 +56,192 @@ const BasePicker = (Picker: React.ComponentType<any>) => {
 
 				props.onBlur && props.onBlur();
 				//Update the focus and change the previous colour to the current colour
-				setState({ ...state, isFocused: false, prevCol: state.currCol });
+				setState(state => ({ ...state, prevCol: state.currCol }));
 			}
 		}
 
-		const setUserColour = (col: string) => {
+		const setUserColour = (col: string | undefined | null) => {
+			if (!col) return;
+
 			props.onInput && props.onInput(col);
 
-			if (isValidColour(col)) {
-				setState({ ...state, currCol: Color(col).hsv() });
-			}
+			const v = toValue(col, props.inputs?.defaultRepresentation || "HEX");
+			if (v) setState(state => ({ ...state, currCol: v }));
+		}
+
+		const onPaste = (col: string | undefined | null) => {
+			const v = toValue(col);
+
+			if (v) setState(state => ({ ...state, currCol: v }));
+		}
+
+		const update = (col: string) => {
+			setState(state => ({ ...state, currCol: Color(col) }));
 		}
 
 		const styles = reactCSSExtra({
 			"default": {
 				container: {
-					padding: "5px 5px 5px 5px",
-					width: props.width,
-					height: props.height,
-					userSelect: "none",
+					//The inline-table allows min-height to be the height of the content
+					display: "inline-table",
+					width: props.width || "auto",
+					height: props.height || "auto",
 					font: props.style?.font,
-					background: props.style?.colours?.background || ((props.theme || "DARK") === "DARK" ? "#161819" : "#FFFFFF"),
+					fontSize: props.style?.fontSize,
+					fontWeight: props.style?.fontWeight,
+					background: props.style?.colours?.background || (props.theme === "LIGHT" ? "#FFFFFF" : "#161819"),
+					boxShadow: props.style?.dropShadow === false ? "" : "0px 0px 20px 2px rgba(0, 0, 0, 0.7)",
+					userSelect: "none",
 					borderRadius: "4px",
-					position: "relative",
-				}
+					padding: "5px 5px 5px 5px",
+					minWidth: "min-content",
+					minHeight: "min-content",
+				},
+				pickerContainer: {
+					display: "flex",
+					flexDirection: "column",
+					gap: "5px",
+				},
+				compContainer: {
+					display: "flex",
+					flexDirection: "row",
+					gap: "5px",
+				},
+				previewContainer: {
+					flexGrow: 0,
+					flexShrink: 1,
+					width: "1.5rem",
+					minWidth: "1rem",
+				},
+				paletteContainer: {
+					flexGrow: 1,
+					minWidth: "6rem",
+					display: "flex",
+				},
+				sliderContainer: {
+					flexGrow: 1,
+					minWidth: "3.5rem",
+				},
+				inputsContainer: {
+					alignItems: "flex-end",
+				},
+				buttonsContainer: {
+					display: "flex",
+					columnGap: "5px",
+				},
 			},
+			"vert": {
+				pickerContainer: {
+					flexDirection: "column",
+				},
+				compContainer: {
+					flexDirection: "column",
+				},
+				previewContainer: {
+					flexGrow: 0,
+					flexShrink: 0,
+					height: "2rem",
+					minHeight: "2rem",
+					width: "2rem",
+					minWidth: "2rem",
+					alignItems: "flex-start"
+				},
+				paletteContainer: {
+					flexGrow: 1,
+					width: "100%",
+					minHeight: "4.5rem",
+				},
+				sliderContainer: {
+
+				},
+				inputsContainer: {
+
+				},
+				buttonsContainer: {
+
+				},
+			}
+		}, {
+			"vert": props.layout === "VERT",
 		});
 
-		const updatePrevCol = () => {
-			setState({ ...state, prevCol: state.currCol });
-		}
-
 		return (
-				//Tell the provider the theme given by the user
+			//Tell the provider the theme given by the user
 			<theme.Provider value={props.theme || "DARK"}>
-				{
-					//Focus is passed down as a prop
-					props.visible === false ? <div></div> :
-						<div
-							ref={(r) => { if (r) self = r; }}
-							style={styles.container}
+				<div style={{ position: "relative" }}>
+					{
+						//Focus is passed down as a prop
+						props.visible === false ? <div></div> :
+							<div
+								ref={(r) => { if (r) self = r; }}
 
-							onMouseDown={onFocused}
-							onTouchStart={onFocused}
-						>
-							<Grid>
-								<Picker {...state} {...props} update={updatePrevCol}></Picker>
+								style={styles.container}
 
-								<Row columnGap="10px">
-									<Col grow={0} shrink={1} width="2.5rem" minWidth="1rem">
-										<Preview
-											previousColour={state.prevCol}
-											currentColour={state.currCol}
-										></Preview>
-									</Col>
+								onMouseDown={onFocused}
+								onTouchStart={onFocused}
+							>
+								<div style={styles.pickerContainer}>
+									{/* I honestly tried so much to stop prop drilling all the way to the swatch container with things like the context API, 
+								event emitters, etc, most didn't work and what did had other issues, so I'd like to know if theres a better way to do this */}
+									<Picker {...state} {...props} $update={update}></Picker>
 
-									<Col grow={1} minWidth="6rem">
-										<Palette
-											currentColour={state.currCol}
-											pointerSize={props.style?.circleSize || "16px"}
-											onChanged={(s, v) => {
-												setState({
-													...state,
-													currCol: state.currCol.saturationv(s).value(v),
-												});
-											}}
-										></Palette >
-									</Col>
+									{/* Order set to 2 to allow components to go above and below this row */}
+									<div style={styles.compContainer}>
 
-									<Col grow={1} minWidth="3.5rem">
-
-										<Slider
-											defaultValue={state.currCol.hue()}
-											pointerSize={props.style?.circleSize || "0.9rem"}
-											onChanged={(h: number) => {
-												setState({
-													...state,
-													currCol: state.currCol.hue(h),
-												});
-											}}
-										>
-										</Slider>
+										{/* I kinda suck at flexbox so this is probably possible with flexbox but basically I need to move the
+										preview to between the sliders when the layout is different */}
 										{
-											props.inputs?.showAlpha === false ?
-												<div></div> :
-												<Slider
-													type="ALPHA"
-													defaultValue={state.currCol.alpha()}
-													pointerSize={props.style?.circleSize || "0.9rem"}
-													onChanged={(a: number) => {
-														setState({
-															...state,
-															currCol: state.currCol.alpha(a),
-														});
-													}}
-												>
-												</Slider>
+											props.layout !== "VERT" ?
+												<div style={styles.previewContainer}>
+													<Preview
+														previousColour={state.prevCol}
+														currentColour={state.currCol}
+													></Preview>
+												</div>
+												: <div></div>
 										}
-										<Row columnGap="10px" align="flex-end">
-											<Col>
+
+										<div style={styles.paletteContainer}>
+											<Palette
+												currentColour={state.currCol}
+												pointerSize={props.style?.circleSize || "1rem"}
+
+												onChanged={(s, v) => setState({ ...state, currCol: state.currCol.saturationv(s).value(v) })}
+											></Palette >
+										</div>
+
+										<div style={styles.sliderContainer}>
+
+											<div style={{ paddingLeft: "5px" }}>
+												<Slider
+													defaultValue={state.currCol.hue()}
+													pointerSize={props.style?.circleSize || "0.9rem"}
+
+													onChanged={(h: number) => setState({ ...state, currCol: state.currCol.hue(h) })}
+												></Slider>
+												{
+													props.layout === "VERT" ?
+														<div style={styles.previewContainer}>
+															<Preview
+																previousColour={state.prevCol}
+																currentColour={state.currCol}
+															></Preview>
+														</div>
+														: <div></div>
+												}
+												{
+													props.inputs?.showAlpha === false ?
+														<div></div> :
+														<Slider
+															type="ALPHA"
+															defaultValue={state.currCol.alpha()}
+															pointerSize={props.style?.circleSize || "0.9rem"}
+															onChanged={(a: number) => setState({ ...state, currCol: state.currCol.alpha(a) })}
+														>
+														</Slider>
+												}
+											</div>
+											<div style={styles.inputsContainer}>
 												{
 													props.inputs?.showColourInput === false ? <div></div> :
 														<Inputs
@@ -173,30 +253,32 @@ const BasePicker = (Picker: React.ComponentType<any>) => {
 												}
 												{
 													props.inputs?.allowCopyAndPaste === false ? <div></div> :
-														<Row columnGap="10px">
-															<Col>
-																<Button text="Copy" width="3rem" height="1.5rem" onClick={() => {
-																	props.onCopy && props.onCopy();
-
-																	copyToClipboard(state.currCol.string(0));
-																}}></Button>
-															</Col>
-															<Col>
-																<Button text="Paste" width="3rem" height="1.5rem" onClick={async () => {
-																	props.onPaste && props.onPaste();
-
-																	setUserColour(await readFromClipboard());
-																}}></Button>
-															</Col>
-														</Row>
+														<div style={styles.buttonsContainer}>
+															<div>
+																<div style={{ paddingTop: "5px" }}>
+																	<Button text="Copy" width="3rem" height="1.5rem" onClick={() => {
+																		props.onCopy && props.onCopy();
+																		copyToClipboard(state.currCol.string(1));
+																	}}></Button>
+																</div>
+															</div>
+															<div>
+																<div style={{ paddingTop: "5px" }}>
+																	<Button text="Paste" width="3rem" height="1.5rem" onClick={async () => {
+																		props.onPaste && props.onPaste();
+																		onPaste(await readFromClipboard());
+																	}}></Button>
+																</div>
+															</div>
+														</div>
 												}
-											</Col>
-										</Row>
-									</Col>
-								</Row>
-							</Grid>
-						</div>
-				}
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+					}
+				</div>
 			</theme.Provider >
 		)
 	}

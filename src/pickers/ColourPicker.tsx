@@ -1,15 +1,29 @@
 import React from "react";
 
+import Color from "color";
+
+import SwatchContainer from "../components/Swatches";
+
 import BasePicker from "../helpers/PickerWrapper";
 
-import { Row } from "../components/flex/Flex";
+import { ReactPickers } from "../../types";
 
+const ReactColour: React.FC<ReactPickers.PickerProps & ReactPickers.State> = (props) => {
 
-const ReactColour: React.FC = () => {
+	const swatchSelected = (col: string) => {
+		props.swatches?.onSwatchSelected && props.swatches?.onSwatchSelected(Color(col));
+		props.$update && props.$update(col);
+	}
 
 	return (
-		<Row>
-		</Row>
+		//Order of 2 puts it below the picker
+		<div style={{ order: 2 }}>
+			<SwatchContainer
+				{...props.swatches}
+				onSelected={swatchSelected}
+				currCol={props.currCol}
+			></SwatchContainer>
+		</div>
 	)
 }
 

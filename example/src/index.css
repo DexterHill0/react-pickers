@@ -1,3 +1,9 @@
+html {
+	width: 100%;
+	height: 100%;
+	scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -6,9 +12,289 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  width: 100%;
+  height: 100%;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+/* ------ DEMO PAGE ------ */
+
+.demo-page {
+	background: #161616;
+	width: 100%;
+	height: 100%;
+	box-shadow: 0px 4px 9px 0px #000000;
+}
+
+.demo-content {
+	width: 100%;
+	height: 100%;
+
+	display: flex;
+	flex-wrap: nowrap;
+	flex-direction: row;
+}
+
+.demo-title {
+	order: 1;
+	flex: 0 1 auto;
+
+	display: flex;
+	padding-top: 1.5rem;
+	align-self: flex-start;
+
+	z-index: 2;
+}
+
+.demo-title-heading {
+	color: white;
+	padding-left: 1rem;
+	font-size: 45px;
+}
+
+.demo-title-subtitle {
+	color: white;
+	padding-left: 1rem;
+	font-size: 20px;
+}
+
+.demo-header {
+	display: flex;
+	position: absolute;
+	width: 100%;
+	justify-content: center;
+	align-items: center;
+	position: sticky;
+	top: 0;
+}
+
+.demo-footer {
+	color: white;
+	font-size: 3rem;
+	position: absolute;
+	bottom: 0;
+
+	left: 50%;
+	transform: translateX(-50%);
+
+	cursor: pointer;
+
+	animation: bob 1.7s ease-in-out infinite;
+}
+.demo-footer::before {
+	content: "⌄";
+	position: absolute;
+	bottom: 30%;
+}
+
+@keyframes bob {
+	0% {
+		margin-bottom: 3px;
+	}
+	50% {
+		margin-bottom: 15px;
+	}
+	100% {
+		margin-bottom: 3px;
+	}
+}
+
+.demo-colour-picker {
+	order: 0;
+    flex: 2 1 auto;
+
+	display: inline-flex;
+}
+
+.demo-colour-picker-container {
+	position: relative;
+	width: 100%;
+	height: 100%;
+
+	min-height: 30rem;
+	max-height: 50rem;
+
+	display: grid; 
+	grid-template-columns: 1fr 10rem; 
+	grid-template-rows: 3fr;
+	grid-template-areas: 
+		"bg text";
+	justify-items: start;
+
+	top: 17%;
+}
+
+.demo-colour-picker-background-container {
+	grid-area: bg;
+
+	display: grid;
+	width: 100%;
+	grid-template-rows: 1fr 15rem; 
+	grid-template-areas: 
+		"bg"
+		"code"; 
+}
+
+.demo-colour-picker-background {
+	grid-area: bg;
+
+	min-width: 15rem;
+	min-height: 27rem;
+	max-height: 40rem;
+
+	background: #fff;
+	border-radius: 0 100px 100px 0;
+	box-shadow: 5px 5px 15px 5px rgba(0,0,0,0.15);
+}
+
+.demo-colour-picker-name { 
+	grid-area: text;
+
+	white-space: nowrap;
+	color: white;
+	font-size: 35px;
+	writing-mode: vertical-rl;
+
+	transform: translateY(5%);
+}
+
+.demo-colour-picker-code-container {
+	grid-area: code;
+	
+	position: relative;
+	left: 5%;
+	z-index: 3;
+	display: inline-table;
+}
+
+.demo-colour-picker-code {
+	width: 120%;
+	min-width: min-content;
+	position: absolute;
+	padding-bottom: 1.5rem;
+}
+
+.demo-colour-picker-code-highlight {
+	overflow: hidden;
+	border-radius: 7px;
+	box-shadow: 0px 0px 19px -3px #000000;
+}
+
+.demo-colour-picker-code-copy {
+	position: absolute;
+	right: 10px;
+	top: 23px;
+	color: white;
+}
+
+.demo-colour-picker-code-copy:active {
+	color: grey;
+}
+
+
+
+.demo-gradient-picker {
+	order: 2;
+    flex: 2 1 auto;
+
+	display: inline-flex;
+}
+
+.demo-gradient-picker-container {
+	position: relative;
+	width: 100%;
+	height: 100%;
+
+	min-height: 30rem;
+	max-height: 50rem;
+
+	display: grid; 
+	grid-template-columns: 10rem 1fr; 
+	grid-template-rows: 3fr;
+	grid-template-areas: 
+		"text bg"; 
+	justify-items: end;
+
+	top: 24%;
+}
+
+.demo-gradient-picker-name {
+	grid-area: text;
+
+	white-space: nowrap;
+	color: white;
+	font-size: 32px;
+	writing-mode: vertical-lr;
+	transform: scale(-1) translateY(55%);
+}
+
+.demo-gradient-picker-background-container {
+	display: grid;
+	width: 100%;
+	grid-template-rows: 1fr 15rem; 
+	grid-template-areas: 
+		"bg"
+		"code";  
+}
+
+.demo-gradient-picker-background {
+	grid-area: bg;
+
+	min-width: 15rem;
+	min-height: 27rem;
+	max-height: 40rem;
+
+	background: #fff;
+	border-radius: 100px 0 0 100px;
+	box-shadow: -5px 5px 15px 5px rgba(0,0,0,0.15);
+}
+
+.demo-gradient-picker-code-container {
+	position: relative;
+	grid-area: code;
+	left: 0;
+	z-index: 3;
+	display: inline-table;
+}
+
+.demo-gradient-picker-code {
+	width: 120%;
+	min-width: min-content;
+	position: absolute;
+	padding-bottom: 3.5rem;
+}
+
+
+.demo-gradient-picker-highlight {
+	overflow: hidden;
+	border-radius: 7px;
+	box-shadow: 0px 0px 19px -3px #000000;
+}
+
+.demo-gradient-picker-code-copy {
+	position: absolute;
+	right: 10px;
+	top: 23px;
+	color: white;
+}
+
+.demo-gradient-picker-code-copy:active {
+	color: grey;
+}
+
+
+/* ------ DEMO PAGE END ------ */
+
+/* ------ DOCS PAGE ------ */
+
+.docs-page {
+	width: 100%;
+	height: 100%;
+	top: 100%;
+	background: #212121;
 }

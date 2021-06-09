@@ -9,8 +9,12 @@ class Gradient {
 		value: string;
 	}
 	colourStops: {
-		type: "hex" | "rgb" | "rgba",
-		value: string,
+		type: string;
+		value: string
+		length: {
+			type: string,
+			value: string
+		}
 	}[];
 
 	constructor(g: string | ReactPickers.GradientObject) {

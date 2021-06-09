@@ -1,11 +1,13 @@
 import React from "react";
 
-import { ReactColour } from "react-pickers";
+import HomeDemos from "./HomeDemos";
+import HomeDocs from "./HomeDocs";
 
 const App = () => {
 	return (
-		<div style={{ resize: "both", border: "2px solid red", overflow: "hidden" }}>
-			<ReactColour width="inherit" height="inherit" />
+		<div style={{ width: "100%", height: "100%" }}>
+			<HomeDemos></HomeDemos>
+			<HomeDocs></HomeDocs>
 		</div>
 	);
 }

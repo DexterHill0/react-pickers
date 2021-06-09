@@ -13,7 +13,7 @@ interface Props {
 
 	pointerSize: string;
 
-	onChanged?: (saturation: number, value: number) => void;
+	onChanged: (s: number, value: number) => void;
 }
 
 const Palette: React.FC<Props> = (props: Props) => {
@@ -26,11 +26,11 @@ const Palette: React.FC<Props> = (props: Props) => {
 	}, [props.currentColour]);
 
 	const handleMove = (e: any) => {
-		const { s, v } = calculateSaturation(e, container, pointer);
+		const { s, v } = calculateSaturation(e, container);
 
 		setValues(s, v);
 
-		props.onChanged && props.onChanged(s, v);
+		props.onChanged(s, v);
 	}
 
 	const setValues = (saturation: number, value: number) => {
@@ -42,12 +42,14 @@ const Palette: React.FC<Props> = (props: Props) => {
 		"default": {
 			draggable: {
 				position: "relative",
-				width: "100%",
-				height: "100%",
-			},
-			mainContainer: {
 				width: "inherit",
 				height: "inherit",
+				marginBottom: "5px",
+				flex: 1,
+			},
+			mainContainer: {
+				width: "100%",
+				height: "100%",
 				borderRadius: "4px",
 				position: "relative",
 				background: `linear-gradient(to top, #000, transparent),
@@ -86,7 +88,7 @@ const Palette: React.FC<Props> = (props: Props) => {
 				<div style={styles.pointerContainer}>
 					<div style={styles.pointer}
 						ref={r => { if (r) pointer = r; }}
-				></div>
+					></div>
 				</div>
 			</div >
 		</Draggable>

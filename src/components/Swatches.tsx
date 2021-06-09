@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
 
 import reactCSSExtra from "reactcss-extra";
-import Color from "color";
 
 import Button from "./Button";
 import Checker from "./Checkerboard";
 import Draggable from "./Draggable";
-import { Col, Grid, Row } from "./flex/Flex";
 
 import { splitEvent } from "../helpers/Utils";
 import Gradient from "../helpers/Gradient";
@@ -35,74 +33,21 @@ const useSwatches = (defaultSwatches: string[], max: number) => {
 		if (swatches.length + 1 < max) setSwatches([...swatches, swatch]);
 	}
 	const removeSwatch = (index: number) => {
-		if (swatches.length - 1 >= 0) {
-			setSwatches([...swatches.slice(0, index), ...swatches.slice(index + 1)]);
+		if (swatches.length - 1 >= defaultSwatches.length) {
+			setSwatches(swatches.filter((_, i) => i !== index));
 		}
 	}
 
 	return { swatches, addSwatch, removeSwatch };
 }
 
-interface SwatchProps {
-	col: string;
-	index: number;
-
-	onRemove: (index: number) => void;
-	onSelected: (col: string) => void;
-}
-
-const Swatch: React.FC<SwatchProps> = (props: SwatchProps) => {
-	let startY: number = 0;
-
-	const handleMove = (e: any) => {
-		const { y } = splitEvent(e);
-		if (startY === 0) {
-			//Store the starting touch so I can calculate the change in distance
-			startY = y;
-		}
-
-		const hidden = Math.abs(startY - y);
-
-		//Drag threshold for removing
-		if (hidden >= 28 && hidden <= 30) {
-			props.onRemove(props.index);
-		}
-	}
-
-	return (
-		<Draggable onDragged={handleMove}>
-			<div onClick={() => props.onSelected(props.col)}>
-				<div style={{
-					borderRadius: "4px",
-					background: props.col,
-					width: "1.9rem",
-					height: "1.9rem",
-				}}></div>
-				<Checker></Checker>
-			</div>
-		</Draggable>
-	);
-}
-
-interface ContainerProps extends ReactPickers.PickerThemeProps {
-	showSwatches?: boolean;
-
-	disableSwatchCollapse?: boolean;
-	allowSave?: boolean;
-	maxSwatches?: number;
-	defaultSwatches?: string[];
-
-	currentColour: ReactPickers.Colour;
-
-	onSwatchAdded?: (swatch: ReactPickers.Swatch) => void;
-	onSwatchRemoved?: (index: number) => void;
-	onSwatchSelected?: (swatch: ReactPickers.Swatch) => void;
-}
+type ContainerProps = ReactPickers.SwatchProps & ReactPickers.State & { onSelected: (col: string) => void } & ReactPickers.PickerThemeProps;
 
 const SwatchContainer: React.FC<ContainerProps> = (props: ContainerProps) => {
+	let startY: number = 0;
+	let clIndex: number = -1;
 
 	const [isShown, setIsShown] = useState(false);
-
 	const { swatches, addSwatch, removeSwatch } = useSwatches(props.defaultSwatches || [], props.maxSwatches || 15);
 
 	const styles = reactCSSExtra({
@@ -122,51 +67,75 @@ const SwatchContainer: React.FC<ContainerProps> = (props: ContainerProps) => {
 		}
 	});
 
-	const remove = (index: number) => {
-		props.onSwatchRemoved && props.onSwatchRemoved(index);
+	const handleMove = (e: any) => {
+		const { y } = splitEvent(e);
+		if (startY === 0 && clIndex === -1) {
+			//Store the starting touch so I can calculate the change in distance
+			startY = y;
+			//Get the key of the swatch
+			clIndex = parseInt(e.target.dataset.key);
+		}
 
-		removeSwatch(index);
+		const hidden = Math.abs(startY - y);
+
+		//Drag threshold for removing
+		if (hidden >= 28 && hidden <= 30 && clIndex >= 0) {
+			removeSwatch(clIndex);
+			props.onSwatchRemoved && props.onSwatchRemoved(clIndex);
+
+			clIndex = -1;
+		}
+	}
+
+	const reset = () => {
+		clIndex = -1;
+		startY = 0;
 	}
 
 	return (
 		<div style={styles.container}>
 			{
 				(props.showSwatches || true) ?
-					<Grid>
-						<Row>
-							<Col grow={1} maxWidth="9rem">
+					<div style={{ display: "flex", flexDirection: "column" }}>
+
+						<div style={{ display: "flex" }}>
+							<div style={{ flexGrow: 1, maxWidth: "7.5rem" }}>
 								<div onClick={() => setIsShown(!isShown)}>
 									<div>{isShown ? "▼" : "▶"}&nbsp;&nbsp;&nbsp;Swatches</div>
 								</div>
-							</Col>
-							<Col>
+							</div>
+							<div>
 								{
 									(props.allowSave || true) ? <Button width="3rem" height="1.5rem" text="Save" onClick={() => {
-										addSwatch(props.currentColour.hsl().toString());
+										addSwatch(props.currCol.string());
 										//Show the swatches if a new one is added
 										setIsShown(true);
 										//Emit the event if a new swatch needs to be added
-										props.onSwatchAdded && props.onSwatchAdded(props.currentColour);
+										props.onSwatchAdded && props.onSwatchAdded(props.currCol);
 									}}></Button> : <div></div>
 								}
-							</Col>
-						</Row>
-						<Row>
-							<Col grow={1}>
-								<div style={styles.swatchContainer}>
-									{
-										swatches.map((s, i) => <Swatch
+							</div>
+						</div>
+
+						<div style={{ flexGrow: 1 }}>
+							<Draggable onDragged={handleMove} onMouseUp={reset} style={styles.swatchContainer}>
+								{
+									swatches.map((s, i) => (
+										<div
 											key={i}
-											col={s}
-											onRemove={remove}
-											onSelected={(col) => props.onSwatchSelected && props.onSwatchSelected(Color(col))}
-											index={i}>
-										</Swatch>)
-									}
-								</div>
-							</Col>
-						</Row>
-					</Grid>
+											style={{ width: "1.9rem", height: "1.9rem", position: "relative", zIndex: 1 }}
+											onClick={() => { props.onSelected && props.onSelected(s) }}
+										>
+											<div style={{ top: 0, left: 0, position: "absolute", width: "inherit", height: "inherit", zIndex: -1, borderRadius: "4px", }}>
+												<Checker></Checker>
+												<div data-key={i} style={{ borderRadius: "inherit", background: s, width: "inherit", height: "inherit", }}></div>
+											</div>
+										</div>
+									))
+								}
+							</Draggable>
+						</div>
+					</div>
 					: <div></div>
 			}
 		</div>

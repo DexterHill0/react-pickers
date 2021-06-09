@@ -2,7 +2,7 @@
 
 > A feature rich colour and gradient picker made in React
 
-[![NPM](https://img.shields.io/npm/v/react-pickers.svg)](https://www.npmjs.com/package/@dexterhill0/react-pickers) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+[![NPM](https://img.shields.io/npm/v/@dexterhill0/react-pickers.svg)](https://www.npmjs.com/package/@dexterhill0/react-pickers) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 ## Demo
 
@@ -41,8 +41,9 @@ class Example extends Component {
 
 
 ## Known Bugs:
-* The mouse is not centred on the pointer when selecting a saturation.
-* The checkerboard seems to bug out on FireFox.
+
+# Notes
+* FireFox has not implemented reading from clipboard, so copy-pasting colours will *not* work.
 
 
 ## License
