@@ -1,11 +1,13 @@
 import React from "react";
 
-import Home from "./Home";
+import HomeDemos from "./HomeDemos";
+import HomeDocs from "./HomeDocs";
 
 const App = () => {
 	return (
 		<div style={{ width: "100%", height: "100%" }}>
-			<Home></Home>
+			<HomeDemos></HomeDemos>
+			<HomeDocs></HomeDocs>
 		</div>
 	);
 }
