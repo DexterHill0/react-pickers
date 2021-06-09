@@ -2,14 +2,13 @@ import Color from "color";
 import { ReactPickers } from "../../types";
 import { map, splitEvent } from "./Utils";
 
-export const calculateSaturation = (e: any, container: HTMLDivElement, _pointer: HTMLDivElement): { s: number, v: number } => {
+export const calculateSaturation = (e: any, container: HTMLDivElement): { s: number, v: number } => {
 	const { width: cWidth, height: cHeight, left, top } = container.getBoundingClientRect();
-	// const { width: pWidth, height: pHeight } = pointer.getBoundingClientRect();
 
 	let { x, y } = splitEvent(e);
 
-	x = Math.max(0, Math.min(x - 2 - left + window.pageXOffset, cWidth));
-	y = Math.max(0, Math.min(y - 2 - top + window.pageYOffset, cHeight));
+	x = Math.max(0, Math.min(x - left - window.pageXOffset, cWidth));
+	y = Math.max(0, Math.min(y - top - window.pageYOffset, cHeight));
 
 	const saturation = (x / cWidth) * 100;
 	const brightness = (1 - (y / cHeight)) * 100;
@@ -20,11 +19,11 @@ export const calculateSaturation = (e: any, container: HTMLDivElement, _pointer:
 	}
 }
 
-export const calculateHueAlpha = (e: any, container: HTMLDivElement, _pointer: HTMLDivElement, type: "HUE" | "ALPHA"): number => {
+export const calculateHueAlpha = (e: any, container: HTMLDivElement, type: "HUE" | "ALPHA"): number => {
 	const { width: cWidth, left } = container.getBoundingClientRect();
 	let { x } = splitEvent(e);
 
-	x = Math.max(0, Math.min(x - left, cWidth));
+	x = Math.max(0, Math.min(x - left - window.pageXOffset, cWidth));
 
 	//If type is `HUE`, map from 0 to 360. If type is `ALPHA` map from 1 to 0
 	return map(x, 0, cWidth, type === "HUE" ? 0 : 1, type === "HUE" ? 360 : 0);
@@ -49,7 +48,7 @@ export const isValidColour = (col: any): boolean => {
 		const c = Color(col).array();
 
 		//Sometimes the colour will be parsed but will return NaN, so this check is in place to stop that
-		if (isNaN(c[0]) || isNaN(c[1]) || isNaN(c[2])) return false;
+		if (isNaN(c[0]) || isNaN(c[1]) || isNaN(c[2]) || isNaN(c[3])) return false;
 
 		return true;
 	} catch (e) {
@@ -81,8 +80,12 @@ export const toString = (col: ReactPickers.Colour, mode: ReactPickers.ColourMode
 }
 
 export const toValue = (col: any, mode?: ReactPickers.ColourMode): ReactPickers.Colour | undefined => {
-	//Also need to write a custom to value converter because `color-string` doesn't always work
+	//Also need to write a custom to value converter because `color-string` doesn't work for all of the different ways the colour can be "layed out"
+	//i.e "#ffA000" is "#ffA000" but "ffA000" is "invalid" or even "[10, 10, 10]" is "rgb(10, 10, 10)" but "["10", "10", "10"]" is "invalid"
 
+	/**
+	 * So many edge cases lol
+	 */
 	if (mode === "HEX") {
 		if (col.startsWith("#") && isValidColour(col)) return Color(col);
 
@@ -95,6 +98,20 @@ export const toValue = (col: any, mode?: ReactPickers.ColourMode): ReactPickers.
 		if (isValidColour(hex)) return Color(hex).hsv().alpha(parseInt(alpha, 16) / 100);
 	}
 	else {
+		//All invalid colours come back as "rgb(0, 0, 0)" which is why I first check if they are black/transparent (since that would be 0, 0, 0)
+		//If they are not one of those, and the colour is "0, 0, 0" then it is invalid.
+		const c = convertLiteral(col);
+
+		if (c.includes("0, 0, 0") && (col === "black" || col === "transparent")) return Color(c);
+		else if (!c.includes("0, 0, 0") && (col !== "black" || col !== "transparent")) return Color(c);
+
+
+		if (Array.isArray(col)) {
+			const c = col.map((v: string) => parseFloat(v));
+
+			if (isValidColour(c)) return Color(c);
+		}
+
 		if (isValidColour(col)) return Color(col);
 
 		//Need to split from comma when the user changes the text in the input
@@ -102,4 +119,15 @@ export const toValue = (col: any, mode?: ReactPickers.ColourMode): ReactPickers.
 
 		if (isValidColour(n) && mode) return Color[mode.toLowerCase()]([n[0], n[1], n[2]]).alpha(n[3]);
 	}
+}
+
+const convertLiteral = (literal: string) => {
+	const d = document.createElement("div");
+	d.style.color = literal;
+	document.body.appendChild(d);
+
+	const col = window.getComputedStyle(d).color;
+
+	d.remove();
+	return col;
 }

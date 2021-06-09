@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 
-import { Row } from "../components/flex/Flex";
-// import GradientMode from "../components/GradientModes";
+import Color from "color";
+
+import GradientMode from "../components/GradientModes";
 import GradientStops from "../components/GradientStops";
 import SwatchContainer from "../components/Swatches";
 
+import { toValue } from "../helpers/Colour";
 import Gradient from "../helpers/Gradient";
 import BasePicker from "../helpers/PickerWrapper";
 
@@ -16,26 +18,51 @@ const ReactGradient: React.FC<ReactPickers.GradientPickerProps & ReactPickers.St
 		if (props.defaultGradient && Gradient.isValid(props.defaultGradient)) {
 			return new Gradient(props.defaultGradient);
 		}
-		else return new Gradient("linear-gradient(90deg, rgb(10, 32, 123) 0%, #000 100%)");
+		else return new Gradient("linear-gradient(90deg, #f00 50%, #000 100%)");
 	}
 
 	const [grad] = useState(getGradient());
 
+	const getStops = () => {
+
+		try {
+			const stops = grad.colourStops.map(s => ({
+				type: s.length.type,
+				loc: s.length.value,
+				col: toValue(s.value, s.type.toUpperCase() as ReactPickers.ColourMode) || Color(),
+			}));
+
+			return stops;
+		} catch (e) {
+			console.error("Unable to parse (default) gradient!\nPlease check that the gradient only uses HEX / RGB[A] colours (gradient-parser does not support other colour spaces)");
+
+			return [];
+
+		}
+	}
+
 	return (
 		<React.Fragment>
 
-			<Row order={0}>
-				{/* <GradientMode defaultType={props.defaultGradientType || "linear-gradient"}></GradientMode> */}
-				<GradientStops currentColour={props.currCol} defaultGradient={grad} width="100%" height="4rem"></GradientStops>
-			</Row>
+			<div style={{ order: 0 }}>
+				<div style={{ flexGrow: 1 }}>
+					<GradientStops {...props.stops} currentColour={props.currCol} stops={getStops()} pointerSize={props.style?.circleSize || "1rem"}></GradientStops>
+				</div>
+				{
+					props.inputs?.showGradientType === false ? <div></div> :
+						<div style={{ minWidth: "1rem" }}>
+							<GradientMode defaultType={props.defaultGradientType || "linear-gradient"}></GradientMode>
+						</div>
+				}
+			</div>
 
-			<Row order={2}>
+			<div style={{ order: 2 }}>
 				<SwatchContainer
 					{...props.swatches}
 					$update={props.$update}
 					currCol={props.currCol}
 				></SwatchContainer>
-			</Row>
+			</div>
 		</React.Fragment>
 
 

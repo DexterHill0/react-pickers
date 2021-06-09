@@ -6,6 +6,7 @@ interface Props {
 	style?: any;
 
 	onDragged: (e: any) => void;
+	onMouseUp?: (e: any) => void;
 
 	children?: React.ReactNode;
 }
@@ -18,7 +19,9 @@ const Draggable: React.FC<Props> = (props: Props) => {
 		window.addEventListener(!isTouch ? "mouseup" : "touchend", handleMouseUp);
 	}
 
-	const handleMouseUp = () => {
+	const handleMouseUp = (e: any) => {
+		props.onMouseUp && props.onMouseUp(e);
+
 		removeListeners();
 	}
 

@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import reactCSSExtra from "reactcss-extra";
 
-import { Col, Grid, Row } from "./flex/Flex";
-
 import { toString } from "../helpers/Colour";
 import { withTheme } from "../providers/ThemeProvider";
 
@@ -44,23 +42,14 @@ const Input: React.FC<Props> = (props: Props) => {
 
 	return (
 		<div style={styles.container}>
-			<Grid>
-				<Row>
-					<Col>
-						<div>{props.colourMode}</div>
-						<input type="text" value={focus ? value : constructString()} style={styles.input}
-							onChange={(event) => { setValue(event.target.value); props.onValueChanged && props.onValueChanged(event.target.value) }}
-							onFocus={() => { setFocus(true); setValue(constructString()) }}
-							onBlur={() => setFocus(false)}
-						></input >
-					</Col>
-				</Row>
-			</Grid>
+			<div>{props.colourMode}</div>
+			<input type="text" value={focus ? value : constructString()} style={styles.input}
+				onChange={(event) => { setValue(event.target.value); props.onValueChanged && props.onValueChanged(event.target.value) }}
+				onFocus={() => { setFocus(true); setValue(constructString()) }}
+				onBlur={() => setFocus(false)}
+			></input >
 		</div >
 	)
 }
-
-//value={constructString()}
-
 
 export default withTheme(Input);

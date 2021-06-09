@@ -27,8 +27,8 @@ const withTheme = (Component: React.ComponentType<{ props?: any, $theme?: any }>
 
 									border: "#FFF",
 
-									button: "#74B3CE",
-									input: "#2A2A2A",
+									button: this.props.style?.colours?.buttons || "#74B3CE",
+									input: this.props.style?.colours?.input || "#2A2A2A",
 								},
 								extra: {
 									color: "red"

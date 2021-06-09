@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
 
 import reactCSSExtra from "reactcss-extra";
-import Color from "color";
 
 import Button from "./Button";
 import Checker from "./Checkerboard";
 import Draggable from "./Draggable";
-import { Col, Grid, Row } from "./flex/Flex";
 
 import { splitEvent } from "../helpers/Utils";
 import Gradient from "../helpers/Gradient";
@@ -43,7 +41,7 @@ const useSwatches = (defaultSwatches: string[], max: number) => {
 	return { swatches, addSwatch, removeSwatch };
 }
 
-type ContainerProps = ReactPickers.SwatchProps & ReactPickers.PickerThemeProps & ReactPickers.State;
+type ContainerProps = ReactPickers.SwatchProps & ReactPickers.State & { onSelected: (col: string) => void } & ReactPickers.PickerThemeProps;
 
 const SwatchContainer: React.FC<ContainerProps> = (props: ContainerProps) => {
 	let startY: number = 0;
@@ -89,19 +87,24 @@ const SwatchContainer: React.FC<ContainerProps> = (props: ContainerProps) => {
 		}
 	}
 
+	const reset = () => {
+		clIndex = -1;
+		startY = 0;
+	}
+
 	return (
 		<div style={styles.container}>
 			{
 				(props.showSwatches || true) ?
-					<Grid direction="column">
+					<div style={{ display: "flex", flexDirection: "column" }}>
 
-						<Row display="flex">
-							<Col grow={1} maxWidth="7.5rem">
+						<div style={{ display: "flex" }}>
+							<div style={{ flexGrow: 1, maxWidth: "7.5rem" }}>
 								<div onClick={() => setIsShown(!isShown)}>
 									<div>{isShown ? "▼" : "▶"}&nbsp;&nbsp;&nbsp;Swatches</div>
 								</div>
-							</Col>
-							<Col>
+							</div>
+							<div>
 								{
 									(props.allowSave || true) ? <Button width="3rem" height="1.5rem" text="Save" onClick={() => {
 										addSwatch(props.currCol.string());
@@ -111,40 +114,28 @@ const SwatchContainer: React.FC<ContainerProps> = (props: ContainerProps) => {
 										props.onSwatchAdded && props.onSwatchAdded(props.currCol);
 									}}></Button> : <div></div>
 								}
-							</Col>
-						</Row>
+							</div>
+						</div>
 
-						<Col grow={1}>
-							<Draggable onDragged={handleMove} style={styles.swatchContainer}>
+						<div style={{ flexGrow: 1 }}>
+							<Draggable onDragged={handleMove} onMouseUp={reset} style={styles.swatchContainer}>
 								{
 									swatches.map((s, i) => (
 										<div
 											key={i}
 											style={{ width: "1.9rem", height: "1.9rem", position: "relative", zIndex: 1 }}
-											onClick={() => { props.$update && props.$update(s); props.onSwatchSelected && props.onSwatchSelected(Color(s)) }}
+											onClick={() => { props.onSelected && props.onSelected(s) }}
 										>
-											<div style={{
-												top: 0,
-												left: 0,
-												position: "absolute",
-												width: "inherit",
-												height: "inherit",
-												zIndex: -1,
-											}}>
+											<div style={{ top: 0, left: 0, position: "absolute", width: "inherit", height: "inherit", zIndex: -1, borderRadius: "4px", }}>
 												<Checker></Checker>
-												<div data-key={i} style={{
-													borderRadius: "4px",
-													background: s,
-													width: "inherit",
-													height: "inherit",
-												}}></div>
+												<div data-key={i} style={{ borderRadius: "inherit", background: s, width: "inherit", height: "inherit", }}></div>
 											</div>
 										</div>
 									))
 								}
 							</Draggable>
-						</Col>
-					</Grid>
+						</div>
+					</div>
 					: <div></div>
 			}
 		</div>

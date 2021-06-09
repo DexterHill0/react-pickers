@@ -32,7 +32,7 @@ const Slider: React.FC<Props> = (props: Props) => {
 	}, [props.defaultValue]);
 
 	const handleMove = (e: any) => {
-		const h = calculateHueAlpha(e, container, pointer, type);
+		const h = calculateHueAlpha(e, container, type);
 
 		//I don't need to set the values here because that happens in the useEffect, however with the color library,
 		//once the hue is 360, it wraps around to 0 which would cause the pointer to jump to the beginning of the
@@ -50,12 +50,14 @@ const Slider: React.FC<Props> = (props: Props) => {
 	const styles = reactCSSExtra({
 		"default": {
 			draggableContainer: {
-				width: "100%",
-				height: "0.8rem",
-				marginBottom: "15px",
+				width: `calc(100% - (${props.pointerSize} / 2))`,
+				height: "0.6rem",
+				marginBottom: `calc(${props.pointerSize} - 0.3rem + 5px)`,
 			},
 			sliderContainer: {
 				position: "relative",
+				left: "50%",
+				transform: "translateX(-50%)",
 				width: "inherit",
 				height: "inherit",
 				zIndex: 1,
@@ -63,7 +65,7 @@ const Slider: React.FC<Props> = (props: Props) => {
 			pointerContainer: {
 				position: "relative",
 				transform: `translateX(calc(${props.pointerSize} / -2))`,
-				width: "inherit",
+				width: "100%",
 				height: "inherit",
 			},
 			pointer: {
@@ -74,18 +76,19 @@ const Slider: React.FC<Props> = (props: Props) => {
 				borderRadius: "50%",
 				position: "relative",
 				top: "50%",
-				transform: `translateY(-50%)`
+				transform: "translateY(-50%)",
 			},
 			banner: {
+				borderRadius: "4px",
 				top: 0,
 				left: 0,
 				position: "absolute",
-				width: "inherit",
+				width: "100%",
 				height: "inherit",
 				zIndex: -1,
 			},
 			gradient: {
-				borderRadius: "4px",
+				borderRadius: "inherit",
 				background: "linear-gradient(to right, #f00 0%, #ff0 17%, #0f0, 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%)",
 				width: "inherit",
 				height: "inherit",

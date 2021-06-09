@@ -45,7 +45,7 @@ declare namespace ReactPickers {
 			defaultRepresentation?: ColourMode;
 		}
 
-		size?: Size;
+		layout?: Layout;
 
 		width?: string;
 		height?: string;
@@ -68,8 +68,12 @@ declare namespace ReactPickers {
 
 		onColourChanged?: (colour: Colour) => void;
 
+		stops?: StopProps;
+	}
+
+	export interface StopProps {
 		onStopAdded?: (stop: Stop) => void;
-		onStopRemoved?: (stop: Stop) => void;
+		onStopRemoved?: () => void;
 		onStopDragged?: (stop: Stop) => void;
 	}
 
@@ -109,12 +113,11 @@ declare namespace ReactPickers {
 
 			defaultRepresentation?: ColourMode;
 
-			showGradientType?: GradientMode,
-			showGradientAngle?: number,
+			showGradientType?: boolean;
 		}
 
-		defaultGradientType?: GradientMode,
-		defaultGradientAngle?: number
+		defaultGradientType?: GradientMode;
+		defaultGradientAngle?: number;
 	}
 
 	/**
@@ -124,6 +127,8 @@ declare namespace ReactPickers {
 		colours?: {
 			background?: string;
 			fontColour?: string;
+			buttons?: string;
+			input?: string;
 		};
 
 		fontSize?: string;
@@ -152,7 +157,7 @@ declare namespace ReactPickers {
 	/**
 	 * The sizes of the pickers.
 	 */
-	export type Size = "NORMAL" | "MINI";
+	export type Layout = "HORIZ" | "VERT";
 
 	/**
 	 * Supported colour types.
@@ -218,8 +223,9 @@ declare namespace ReactPickers {
 	 * Gradient stop.
 	 */
 	export type Stop = {
-		loc: number;
-		colour: Colour;
+		type: string,
+		loc: string;
+		col: Colour;
 	}
 
 	/**

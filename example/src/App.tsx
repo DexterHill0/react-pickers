@@ -1,10 +1,12 @@
 import React from "react";
 
-import { ReactGradient } from "react-pickers";
+import Home from "./Home";
 
 const App = () => {
 	return (
-		<ReactGradient theme="DARK" />
+		<div style={{ width: "100%", height: "100%" }}>
+			<Home></Home>
+		</div>
 	);
 }
 
