@@ -64,7 +64,6 @@ declare namespace ReactPickers {
 		onInput?: (text: string) => void;
 		onCopy?: () => void;
 		onPaste?: () => void;
-		onClear?: () => void;
 
 		onColourChanged?: (colour: Colour) => void;
 

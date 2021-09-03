@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 //import { ReactColour } from "react-pickers";
 
@@ -6,6 +6,7 @@ import Highlight from "react-highlight";
 
 import { Animate } from "react-move";
 import { easeSinOut } from "d3-ease";
+import HighlightCopy from "./components/Highlight";
 
 //Colours to pick randomly from
 const cols = [
@@ -41,8 +42,7 @@ const grads = [
 ]
 
 //Code displayed in the code examples
-const colourPickerCode = `
-import { ReactColour } from "react-pickers";
+const colourPickerCode = `import { ReactColour } from "@dexterhill0/react-pickers";
 
 const ColourPicker = () => {
     return (
@@ -54,8 +54,7 @@ const ColourPicker = () => {
 // Click the arrow to read the docs :)
 `;
 
-const gradientPickerCode = `
-import { ReactGradient } from "react-pickers";
+const gradientPickerCode = `import { ReactGradient } from "@dexterhill0/react-pickers";
 
 const GradientPicker = () => {
     return (
@@ -93,7 +92,20 @@ const HomeDemos: React.FC = () => {
 	return (
 		<div className="demo-page">
 
+			<div className="demo-header">
+				<div className="demo-header-content">
+					<div className="demo-header-github-stars">
+						<iframe title="stars" src="https://ghbtns.com/github-btn.html?user=dexterhill0&repo=react-pickers&type=star&count=true&size=large" scrolling="0" width="160px" height="30px" frameBorder="0"></iframe>
+					</div>
+
+					<a href="https://www.npmjs.com/package/@dexterhill0/react-pickers" target="_blank" rel="noopener noreferrer">
+						<img src="https://img.shields.io/npm/v/@dexterhill0/react-pickers.svg" alt="npm badge"></img>
+					</a>
+				</div>
+			</div>
+
 			<div className="demo-content">
+
 				<div className="demo-title">
 					<div>
 						<img src="logo.png" width="110" height="110" alt="npm badge"></img>
@@ -106,7 +118,9 @@ const HomeDemos: React.FC = () => {
 				</div>
 
 				<div className="demo-colour-picker">
-					<div className="demo-colour-picker-container">
+
+					<div className="demo-colour-picker-content">
+
 						<Animate
 							start={{
 								opacity: 0,
@@ -118,51 +132,43 @@ const HomeDemos: React.FC = () => {
 							}}
 						>
 							{({ opacity, background }) =>
-								<div className="demo-colour-picker-background-container">
-									<div className="demo-colour-picker-background" style={{ opacity, background }}></div>
+								<div className="demo-colour-picker-background" style={{ opacity, background }}></div>
+							}
+						</Animate>
 
-									<Animate
-										start={{
-											opacity: 0,
-											bottom: 0,
-										}}
-										enter={{
-											opacity: [1],
-											bottom: [130],
-											timing: { duration: 1200, delay: 100, ease: easeSinOut },
-										}}
-									>
-										{({ opacity, bottom }) =>
-											<div className="demo-colour-picker-code-container">
-												<div
-													className="demo-colour-picker-code"
-													style={{
-														opacity,
-														bottom: bottom + "px",
-													}}
-												>
-													<div className="demo-gradient-picker-code-copy" onClick={(e) => copy(e, colourPickerCode)}>
-														<div className="gg-clipboard"></div>
-													</div>
-
-													<Highlight className="typescript demo-colour-picker-code-highlight">
-														{colourPickerCode}
-													</Highlight>
-												</div>
-											</div>
-										}
-									</Animate>
-
+						<Animate
+							start={{
+								opacity: 0,
+								bottom: 0,
+							}}
+							enter={{
+								opacity: [1],
+								bottom: [90],
+								timing: { duration: 1200, delay: 100, ease: easeSinOut },
+							}}
+						>
+							{({ opacity, bottom }) =>
+								<div style={{
+									opacity,
+									bottom: bottom + "px",
+								}}
+									className="demo-colour-picker-code-container"
+								>
+									<HighlightCopy text={colourPickerCode}></HighlightCopy>
 								</div>
 							}
 						</Animate>
 
+
 						<div className="demo-colour-picker-name">R e a c t C o l o u r</div>
 					</div>
+
 				</div>
 
 				<div className="demo-gradient-picker">
-					<div className="demo-gradient-picker-container">
+
+					<div className="demo-gradient-picker-content">
+
 						<Animate
 							start={{
 								opacity: 0,
@@ -174,66 +180,43 @@ const HomeDemos: React.FC = () => {
 							}}
 						>
 							{({ opacity, background }) =>
+								<div className="demo-gradient-picker-background" style={{ opacity, background }}></div>
+							}
+						</Animate>
 
-								<div className="demo-gradient-picker-background-container">
-									<div className="demo-gradient-picker-background" style={{ opacity, background }}></div>
-
-									<Animate
-										start={{
-											opacity: 0,
-											bottom: 0,
-										}}
-										enter={{
-											opacity: [1],
-											bottom: [120],
-											timing: { duration: 1200, delay: 200, ease: easeSinOut },
-										}}
-									>
-										{({ opacity, bottom }) =>
-											<div className="demo-gradient-picker-code-container">
-												<div
-													className="demo-gradient-picker-code"
-													style={{
-														opacity,
-														bottom: bottom + "px",
-													}}
-												>
-													<div className="demo-gradient-picker-code-copy" onClick={(e) => copy(e, gradientPickerCode)}>
-														<div className="gg-clipboard"></div>
-													</div>
-
-													<Highlight className="typescript demo-gradient-picker-highlight">
-														{gradientPickerCode}
-													</Highlight>
-												</div>
-											</div>
-										}
-									</Animate>
-
+						<Animate
+							start={{
+								opacity: 0,
+								bottom: 0,
+							}}
+							enter={{
+								opacity: [1],
+								bottom: [90],
+								timing: { duration: 1200, delay: 200, ease: easeSinOut },
+							}}
+						>
+							{({ opacity, bottom }) =>
+								<div style={{
+									opacity,
+									bottom: bottom + "px",
+								}}
+									className="demo-gradient-picker-code-container"
+								>
+									<HighlightCopy text={gradientPickerCode}></HighlightCopy>
 								</div>
 							}
 						</Animate>
+
 
 						<div className="demo-gradient-picker-name">R e a c t G r a d i e n t</div>
 					</div>
 				</div>
 			</div>
 
-			<div className="demo-header">
-				<div className="demo-header-github-stars">
-					<iframe title="stars" src="https://ghbtns.com/github-btn.html?user=dexterhill0&repo=react-pickers&type=star&count=true&size=large" scrolling="0" width="160px" height="30px" frameBorder="0"></iframe>
-				</div>
-
-				<a href="https://www.npmjs.com/package/@dexterhill0/react-pickers" target="_blank" rel="noopener noreferrer">
-					<img src="https://img.shields.io/npm/v/@dexterhill0/react-pickers.svg" alt="npm badge"></img>
-				</a>
-			</div>
 
 			<div className="demo-footer" onClick={scroll}>
 				⌄
 			</div>
-			{/* 
-			<div style={{ paddingTop: "120%" }}></div> */}
 
 		</div >
 	);
