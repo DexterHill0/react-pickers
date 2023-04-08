@@ -1,3 +1,5 @@
+## This project is no longer in development.
+
 # react-pickers
 
 > A feature rich colour and gradient picker made in React
